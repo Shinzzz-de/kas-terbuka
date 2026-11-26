@@ -25,7 +25,7 @@
         p.appendChild(d); note.appendChild(p);
       }
     } else {
-      btn.textContent = "Masuk sebagai pengurus";
+      btn.textContent = "Masuk pengurus";
       btn.onclick = () => { $("#login-err").hidden = true; $("#login-ok").hidden = true; $("#m-login").hidden = false; setTimeout(() => $("#login-email").focus(), 30); };
     }
   });

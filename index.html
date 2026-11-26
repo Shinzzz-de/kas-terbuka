@@ -43,8 +43,8 @@ code { font-size: .9em; }
 }
 * { box-sizing: border-box; }
 body { background: var(--bg); color: var(--ink); font-family: var(--font-b); font-size: 16px; line-height: 1.55;
-  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 48px; }
-.wrap { max-width: 1080px; margin: 0 auto; }
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 calc(96px + env(safe-area-inset-bottom, 0px)); }
+.wrap { max-width: 960px; margin: 0 auto; }
 h1, h2, h3 { font-family: var(--font-d); text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
 h1 { font-size: clamp(1.5rem, 3.4vw, 2.1rem); line-height: 1.15; color: var(--brand); }
 h2 { font-size: 1.2rem; }
@@ -61,19 +61,69 @@ h3 { font-size: 1rem; }
 button, input, select, textarea { font: inherit; color: inherit; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-/* Header */
-header.top { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: flex-end; justify-content: space-between; padding-block: 28px 18px; }
-.top .id { min-width: 0; display: grid; gap: 4px; }
-.top .sub { color: var(--ink-2); }
-.role { display: inline-flex; align-items: center; gap: 8px; font-size: .88rem; color: var(--ink-2); }
+/* Bar atas */
+:root { --on-brass: #3B3B3B; --t3-bg: #E3BD90; --t3-fg: #3B3B3B; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --on-brass: #1F1C19; --t3-bg: #675547; --t3-fg: #E3BD90; } }
+:root[data-theme="dark"] { --on-brass: #1F1C19; --t3-bg: #675547; --t3-fg: #E3BD90; }
+.sum-month dt { white-space: nowrap; }
+.topbar { display: flex; align-items: center; gap: 10px; padding-block: 14px; min-height: 64px; }
+.back { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--surface); border: 1px solid var(--line); color: var(--ink); flex: none; }
+.back svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.tb-title { flex: 1; min-width: 0; display: grid; }
+.tb-app { font-family: var(--font-d); font-weight: 700; color: var(--brand); font-size: 1.05rem; }
+.tb-page { font-family: var(--font-d); font-weight: 700; font-size: 1.25rem; line-height: 1.2; overflow-wrap: anywhere; }
+.tb-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+.role { display: inline-flex; align-items: center; gap: 8px; font-size: .85rem; color: var(--ink-2); }
 .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ink-3); flex: none; }
 .role.editor .dot { background: var(--accent); }
+@media (max-width: 560px) { .tb-right .role { display: none; } }
 
-/* Tabs */
-nav.tabs { display: flex; gap: 4px; overflow-x: auto; border-bottom: 1px solid var(--line); margin-bottom: 20px; scrollbar-width: none; }
-nav.tabs a { padding: 10px 14px; text-decoration: none; color: var(--ink-2); font-weight: 600; border-bottom: 2px solid transparent; white-space: nowrap; margin-bottom: -1px; }
-nav.tabs a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--accent); }
-nav.tabs a:hover { color: var(--ink); }
+/* Beranda bergaya aplikasi */
+.home { display: grid; gap: 20px; }
+.hello { display: grid; gap: 2px; padding-block: 4px 4px; }
+.hello .greet { font-size: 1.15rem; color: var(--ink-2); }
+.hello h1 { font-size: clamp(1.8rem, 6vw, 2.6rem); line-height: 1.1; }
+.hello .sub { color: var(--ink-3); font-size: .92rem; }
+.menu { background: var(--surface); border: 1px solid var(--line); border-radius: 22px; padding: 20px 10px 8px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px 4px; }
+.mi { display: grid; justify-items: center; align-content: start; gap: 8px; padding: 6px 4px 14px; border: 0; background: none; color: var(--ink); text-decoration: none; cursor: pointer; border-radius: 14px; font: inherit; }
+.mi:hover { background: var(--bg); }
+.mi:active .ic { transform: scale(.94); }
+.ml { font-size: .82rem; font-weight: 600; text-align: center; line-height: 1.25; }
+.ic { position: relative; display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; flex: none; }
+.ic svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.ic.sm { width: 40px; height: 40px; } .ic.sm svg { width: 20px; height: 20px; }
+.ic.t1 { background: var(--brand); color: var(--bg); }
+.ic.t2 { background: var(--accent); color: var(--accent-ink); }
+.ic.t3 { background: var(--t3-bg); color: var(--t3-fg); }
+.ic.t4 { background: var(--surface-2); color: var(--ink); }
+.badge { position: absolute; top: -4px; right: -8px; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 11px; background: var(--bad); color: var(--surface); font-size: .72rem; font-weight: 700; display: grid; place-items: center; border: 2px solid var(--surface); }
+.status { border-radius: 22px; overflow: hidden; border: 1px solid var(--line); background: var(--surface); }
+.st-head { display: flex; justify-content: space-between; gap: 10px; padding: 12px 20px; background: var(--surface-2); font-weight: 700; font-size: .95rem; }
+.st-head #st-date { font-weight: 500; color: var(--ink-2); white-space: nowrap; }
+.st-body { padding: 16px 20px 20px; display: grid; gap: 10px; }
+.st-body .big { font-family: var(--font-d); font-size: clamp(2rem, 7vw, 2.8rem); font-weight: 700; line-height: 1.05; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.st-body .meta { font-size: .88rem; color: var(--ink-3); }
+.cta { margin-top: 6px; width: 100%; border: 0; border-radius: 12px; padding: 14px 16px; background: var(--brass); color: var(--on-brass); font-weight: 700; font-size: 1rem; cursor: pointer; }
+.cta:hover { filter: brightness(1.04); }
+.duo { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.tile { display: grid; align-content: start; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 22px; padding: 18px; color: var(--ink); text-decoration: none; min-width: 0; }
+a.tile:hover { border-color: var(--ink-3); }
+.tile-head { display: flex; align-items: center; gap: 12px; font-size: 1rem; }
+.tile-foot { color: var(--accent); font-weight: 700; font-size: .9rem; }
+.tile .recent { display: grid; }
+.tile .recent .it:nth-child(n+5) { display: none; }
+.tile.guide { padding: 0; overflow: hidden; }
+.tile-band { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 14px 18px; background: var(--brand); color: var(--bg); }
+.tile-band .linkbtn { color: var(--bg); }
+.tile.guide ul { margin: 0; padding: 14px 18px 18px 36px; }
+
+/* Navigasi bawah */
+nav.bottom-nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 15; display: grid; grid-template-columns: repeat(4, 1fr); background: var(--surface); border-top: 1px solid var(--line);
+  padding: 6px max(8px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px)); }
+nav.bottom-nav a { display: grid; justify-items: center; gap: 2px; padding: 6px 4px; color: var(--ink-3); text-decoration: none; font-size: .75rem; font-weight: 600; border-radius: 12px; }
+nav.bottom-nav a svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+nav.bottom-nav a[aria-current="page"] { color: var(--accent); }
+nav.bottom-nav a[aria-current="page"] svg { stroke-width: 2.3; }
 
 /* Generic */
 .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; min-width: 0; }
@@ -202,15 +252,17 @@ footer { margin-top: 32px; color: var(--ink-3); font-size: .82rem; display: grid
   /* Buku kas sebagai kartu */
   table.ledger thead { display: none; }
   table.ledger, table.ledger tbody, table.ledger tr, table.ledger td { display: block; }
-  table.ledger tr { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; padding: 10px 0; border-bottom: 1px solid var(--line); }
-  table.ledger td { border: 0; padding: 0; }
+  table.ledger tr { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  table.ledger td { border: 0; padding: 0; min-width: 0; }
+  table.ledger .ux .chip { white-space: normal; }
+  table.ledger td.saldo { text-align: right; }
   table.ledger td.tgl { grid-column: 1 / -1; font-size: .78rem; color: var(--ink-3); }
   table.ledger td.uraian { grid-column: 1; grid-row: 2 / span 2; }
   table.ledger td.amt.empty-amt { display: none; }
   table.ledger td.saldo { font-size: .78rem; color: var(--ink-3); }
   table.ledger td.saldo::before { content: "Sisa uang "; }
   table.ledger td.act { grid-column: 1 / -1; }
-  table.ledger tr.saldo-row { grid-template-columns: 1fr auto; padding: 10px; background: var(--surface-2); }
+  table.ledger tr.saldo-row { grid-template-columns: minmax(0, 1fr) auto; padding: 10px; background: var(--surface-2); }
   table.ledger tr.saldo-row td { background: none; }
   table.ledger tr.saldo-row td.uraian { grid-row: auto; }
 }
@@ -220,71 +272,82 @@ footer { margin-top: 32px; color: var(--ink-3); font-size: .82rem; display: grid
 </head>
 <body>
 <div class="wrap">
-  <header class="top">
-    <div class="id">
-      <h1 id="h-nama">Kas rumah ibadah</h1>
-      <span class="sub" id="h-alamat"></span>
-    </div>
-    <div class="row"><span class="role" id="h-role"><span class="dot"></span><span id="h-role-t">Memuat…</span></span>
-  <button class="btn" id="auth-btn" type="button" hidden>Masuk sebagai pengurus</button></div>
+  <header class="topbar">
+    <a class="back" id="back" href="#ringkasan" aria-label="Kembali ke beranda" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a>
+    <div class="tb-title"><span class="tb-app" id="tb-app">Kas Terbuka</span><span class="tb-page" id="page-title" hidden></span></div>
+    <div class="tb-right"><span class="role" id="h-role"><span class="dot"></span><span id="h-role-t">Memuat…</span></span>
+      <button class="btn" id="auth-btn" type="button" hidden>Masuk sebagai pengurus</button></div>
   </header>
-
-  <nav class="tabs" aria-label="Tampilan">
-    <a href="#ringkasan" data-v="ringkasan">Beranda</a>
-    <a href="#buku-kas" data-v="buku-kas">Catatan Uang</a>
-    <a href="#anggaran" data-v="anggaran">Rencana Belanja</a>
-    <a href="#laporan" data-v="laporan">Laporan Bulanan</a>
-    <a href="#pembayaran" data-v="pembayaran" id="tab-pembayaran" hidden>Donasi Masuk</a>
-    <a href="#pengaturan" data-v="pengaturan" id="tab-pengaturan" hidden>Pengaturan</a>
-  </nav>
 
   <div id="auth-note"></div>
   <div id="banners"></div>
 
   <!-- BERANDA -->
-  <section id="v-ringkasan" class="stack">
-    <div class="panel guide" id="guide">
-      <div class="row between"><h2>Cara membaca halaman ini</h2><button class="linkbtn" id="guide-close" type="button">Sembunyikan</button></div>
-      <ul>
-        <li><b>Uang yang tersedia</b> adalah seluruh uang rumah ibadah saat ini, baik tunai di kas maupun di rekening.</li>
-        <li>Uang dibagi ke beberapa <b>kantong dana</b> sesuai tujuannya. Kantong bertanda <b>Khusus</b> hanya boleh dipakai untuk keperluan yang diminta pemberinya.</li>
-        <li>Setiap uang masuk dan keluar dicatat di <a href="#buku-kas">Catatan Uang</a> beserta nama pencatatnya. Catatan tidak bisa dihapus. Jika ada salah catat, catatan itu dibatalkan dengan alasan yang bisa dibaca semua orang.</li>
-      </ul>
+  <section id="v-ringkasan" class="home">
+    <div class="hello">
+      <span class="greet" id="greet">Selamat datang,</span>
+      <h1 id="h-nama">Kas rumah ibadah</h1>
+      <span class="sub" id="h-alamat"></span>
     </div>
 
-    <div class="panel summary">
-      <div class="sum-total">
-        <span class="lbl">Uang yang tersedia saat ini</span>
+    <nav class="menu" aria-label="Menu">
+      <button type="button" class="mi" data-for="pengurus" data-act="catat"><span class="ic t3"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg></span><span class="ml">Catat Uang</span></button>
+      <a class="mi" href="#buku-kas" data-for="all"><span class="ic t1"><svg viewBox="0 0 24 24"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3"/><path d="M9 7.5h6M9 11h6"/></svg></span><span class="ml">Catatan Uang</span></a>
+      <a class="mi" href="#pembayaran" id="tab-pembayaran" data-for="pengurus" hidden><span class="ic t2"><svg viewBox="0 0 24 24"><path d="M4 13l2.5-7h11L20 13v6H4z"/><path d="M4 13h4.5l1 2h5l1-2H20"/></svg><span class="badge" id="pay-badge" hidden></span></span><span class="ml">Donasi Masuk</span></a>
+      <a class="mi" href="#laporan" data-for="all"><span class="ic t2"><svg viewBox="0 0 24 24"><path d="M4 20h16"/><path d="M7 16v-5M12 16V7M17 16v-8"/></svg></span><span class="ml">Laporan Bulanan</span></a>
+      <a class="mi" href="#anggaran" data-for="all"><span class="ic t3"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1"/><path d="M8.5 11l2 2 4-4"/><path d="M9 17h6"/></svg></span><span class="ml">Rencana Belanja</span></a>
+      <button type="button" class="mi" data-for="all" data-act="pos"><span class="ic t4"><svg viewBox="0 0 24 24"><path d="M3 7h15a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3z"/><path d="M3 7l12-4v4"/><circle cx="16.5" cy="13.5" r="1.2"/></svg></span><span class="ml">Kantong Dana</span></button>
+      <button type="button" class="mi" data-for="umum" data-act="grafik"><span class="ic t1"><svg viewBox="0 0 24 24"><path d="M3 17l5-5 4 3 7-8"/><path d="M15 7h4v4"/></svg></span><span class="ml">Arus Kas</span></button>
+      <button type="button" class="mi" data-for="umum" data-act="panduan"><span class="ic t4"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.4a2.5 2.5 0 1 1 3.4 2.4c-.7.3-1 .8-1 1.5v.3"/><path d="M12 17h.01"/></svg></span><span class="ml">Panduan</span></button>
+      <button type="button" class="mi" data-for="all" data-act="wa"><span class="ic t2"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M9 10h6M9 13.5h4"/></svg></span><span class="ml">Bagikan ke WA</span></button>
+      <button type="button" class="mi" data-for="umum" data-act="excel"><span class="ic t3"><svg viewBox="0 0 24 24"><path d="M12 4v11"/><path d="M7.5 10.5L12 15l4.5-4.5"/><path d="M5 20h14"/></svg></span><span class="ml">Unduh Excel</span></button>
+      <a class="mi" href="#pengaturan" id="tab-pengaturan" data-for="pengurus" hidden><span class="ic t4"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></span><span class="ml">Pengaturan</span></a>
+    </nav>
+
+    <section class="status" aria-labelledby="st-t">
+      <div class="st-head"><span id="st-t">Uang tersedia</span><span id="st-date"></span></div>
+      <div class="st-body">
         <div class="big" id="r-total">Rp —</div>
         <div class="meta" id="r-total-meta">Sedang memuat catatan…</div>
+        <dl class="sum-month">
+          <div class="ln head"><dt id="r-bulan-t">Bulan ini</dt><dd id="r-bulan-n"></dd></div>
+          <div class="ln"><dt><span class="swatch" style="background:var(--masuk)"></span>Uang masuk</dt><dd><span id="r-masuk">Rp 0</span><small id="r-masuk-d"></small></dd></div>
+          <div class="ln"><dt><span class="swatch" style="background:var(--keluar)"></span>Uang keluar</dt><dd><span id="r-keluar">Rp 0</span><small id="r-keluar-d"></small></dd></div>
+          <div class="ln"><dt>Sisa bulan ini<small class="dt-help">Uang masuk dikurangi uang keluar</small></dt><dd><span id="r-selisih">Rp 0</span><small id="r-selisih-d"></small></dd></div>
+        </dl>
+        <button class="cta" id="home-cta" type="button">Lihat laporan bulan ini</button>
       </div>
-      <dl class="sum-month">
-        <div class="ln head"><dt id="r-bulan-t">Bulan ini</dt><dd id="r-bulan-n"></dd></div>
-        <div class="ln"><dt><span class="swatch" style="background:var(--masuk)"></span>Uang masuk</dt><dd><span id="r-masuk">Rp 0</span><small id="r-masuk-d"></small></dd></div>
-        <div class="ln"><dt><span class="swatch" style="background:var(--keluar)"></span>Uang keluar</dt><dd><span id="r-keluar">Rp 0</span><small id="r-keluar-d"></small></dd></div>
-        <div class="ln"><dt>Sisa bulan ini<small class="dt-help">Uang masuk dikurangi uang keluar</small></dt><dd><span id="r-selisih">Rp 0</span><small id="r-selisih-d"></small></dd></div>
-      </dl>
+    </section>
+
+    <div class="duo">
+      <a class="tile" href="#buku-kas">
+        <span class="tile-head"><span class="ic t1 sm"><svg viewBox="0 0 24 24"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3"/><path d="M9 7.5h6M9 11h6"/></svg></span><b>Catatan terbaru</b></span>
+        <div class="recent" id="r-recent"></div>
+        <span class="tile-foot">Lihat semua catatan</span>
+      </a>
+      <div class="tile guide" id="guide">
+        <div class="tile-band"><b>Cara membaca halaman ini</b><button class="linkbtn" id="guide-close" type="button">Sembunyikan</button></div>
+        <ul>
+          <li><b>Uang yang tersedia</b> adalah seluruh uang rumah ibadah saat ini, tunai maupun di rekening.</li>
+          <li>Uang dibagi ke beberapa <b>kantong dana</b>. Kantong <b>Khusus</b> hanya boleh dipakai untuk keperluan yang diminta pemberinya.</li>
+          <li>Setiap uang masuk dan keluar dicatat beserta nama pencatatnya. Catatan tidak bisa dihapus. Salah catat dibatalkan dengan alasan yang bisa dibaca semua orang.</li>
+        </ul>
+      </div>
     </div>
 
-    <div>
+    <div id="sec-pos">
       <div class="sec-head"><h2>Uang per kantong dana</h2><p class="help">Jumlah uang di tiap kantong saat ini. Kantong <b>Khusus</b> hanya boleh dipakai untuk keperluan yang tertulis di bawahnya.</p></div>
       <div class="pos-grid" id="r-pos"></div>
     </div>
 
-    <div class="two">
-      <div class="panel">
-        <div class="sec-head">
-          <h2>Uang masuk dan keluar, 6 bulan terakhir</h2>
-          <div class="legend"><span><span class="swatch" style="background:var(--masuk)"></span>Uang masuk</span><span><span class="swatch" style="background:var(--keluar)"></span>Uang keluar</span></div>
-        </div>
-        <div class="chart-wrap" id="r-chart"></div>
-        <p class="help" id="r-chart-note"></p>
-        <details class="tbl"><summary>Lihat angkanya dalam tabel</summary><div class="scroll" id="r-chart-table"></div></details>
+    <div class="panel" id="sec-chart">
+      <div class="sec-head">
+        <h2>Uang masuk dan keluar, 6 bulan terakhir</h2>
+        <div class="legend"><span><span class="swatch" style="background:var(--masuk)"></span>Uang masuk</span><span><span class="swatch" style="background:var(--keluar)"></span>Uang keluar</span></div>
       </div>
-      <div class="panel">
-        <div class="row between" style="margin-bottom:4px"><h2>Catatan terbaru</h2><a class="small" href="#buku-kas" style="color:var(--accent);font-weight:600">Lihat semua catatan</a></div>
-        <div class="recent" id="r-recent"></div>
-      </div>
+      <div class="chart-wrap" id="r-chart"></div>
+      <p class="help" id="r-chart-note"></p>
+      <details class="tbl"><summary>Lihat angkanya dalam tabel</summary><div class="scroll" id="r-chart-table"></div></details>
     </div>
   </section>
 
@@ -372,8 +435,8 @@ footer { margin-top: 32px; color: var(--ink-3); font-size: .82rem; display: grid
     </div>
     <div class="row"><button class="btn primary" id="s-save" type="button">Simpan pengaturan</button><span class="small muted" id="s-msg"></span></div>
     <div class="panel stack" id="s-contoh" hidden>
-      <div class="sec-head" style="margin:0"><h2>Data contoh</h2><p class="help">Catatan yang tampil sekarang masih contoh. Hapus dulu sebelum mulai mencatat uang sungguhan. Pengaturan di atas tidak ikut terhapus.</p></div>
-      <div><button class="btn danger" id="s-contoh-del" type="button">Hapus semua data contoh</button></div>
+      <div class="sec-head" style="margin:0"><h2>Data percobaan</h2><p class="help">Catatan yang dimasukkan saat aplikasi dibuat masih tersimpan. Hapus sebelum mulai mencatat uang sungguhan. Pengaturan di atas tidak ikut terhapus.</p></div>
+      <div><button class="btn danger" id="s-contoh-del" type="button">Hapus semua data percobaan</button></div>
     </div>
   </section>
 
@@ -384,6 +447,12 @@ footer { margin-top: 32px; color: var(--ink-3); font-size: .82rem; display: grid
   </footer>
 </div>
 
+<nav class="tabs bottom-nav" aria-label="Menu utama">
+  <a href="#ringkasan" data-v="ringkasan"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7"/><path d="M6 9.5V20h12V9.5"/></svg><span>Beranda</span></a>
+  <a href="#buku-kas" data-v="buku-kas"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3"/><path d="M9 7.5h6M9 11h6"/></svg><span>Catatan</span></a>
+  <a href="#laporan" data-v="laporan"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h16"/><path d="M7 16v-5M12 16V7M17 16v-8"/></svg><span>Laporan</span></a>
+  <a href="#anggaran" data-v="anggaran"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1"/><path d="M8.5 11l2 2 4-4"/><path d="M9 17h6"/></svg><span>Rencana</span></a>
+</nav>
 <!-- Modal: catat uang -->
 <div class="overlay" id="m-tx" hidden>
   <form class="modal" id="tx-form" novalidate>
@@ -469,7 +538,7 @@ footer { margin-top: 32px; color: var(--ink-3); font-size: .82rem; display: grid
   <form class="modal" id="login-form" novalidate>
     <div class="row between"><h2>Masuk sebagai pengurus</h2><button type="button" class="linkbtn" data-close>Tutup</button></div>
     <p class="small muted" style="margin:0">Kami akan mengirim tautan masuk ke email Anda. Tidak perlu kata sandi. Hanya email yang sudah didaftarkan sebagai pengurus yang bisa mencatat uang.</p>
-    <label class="f">Email<input class="i" type="email" id="login-email" autocomplete="email" placeholder="nama@contoh.com"></label>
+    <label class="f">Email<input class="i" type="email" id="login-email" autocomplete="email" placeholder="nama@email.com"></label>
     <div class="errline" id="login-err" hidden></div>
     <div class="warnline" id="login-ok" hidden style="color:var(--good);background:var(--good-bg)"></div>
     <div class="row" style="justify-content:flex-end"><button type="button" class="btn" data-close>Batal</button><button type="submit" class="btn primary" id="login-submit">Kirim tautan masuk</button></div>
@@ -588,7 +657,7 @@ async function fillNames(root = document) {
   try { ps = S.user ? await S.user.profiles(ids) : {}; } catch { ps = {}; }
   spans.forEach((s) => { const p = ps[s.dataset.uid]; s.textContent = (p && p.name) || "Pengurus"; });
 }
-const byWho = (uid) => (uid ? `<span data-uid="${esc(uid)}">Pengurus</span>` : "data contoh");
+const byWho = (uid) => (uid ? `<span data-uid="${esc(uid)}">Pengurus</span>` : "pengurus");
 
 /* ---------- Header & banners ---------- */
 function renderHeader() {
@@ -598,17 +667,19 @@ function renderHeader() {
   const role = $("#h-role");
   role.classList.toggle("editor", S.canEdit);
   $("#h-role-t").textContent = !S.db ? "Belum tersambung" : S.canEdit ? "Anda pengurus: bisa mencatat uang" : "Anda bisa melihat semua catatan";
-  $("#tab-pengaturan").hidden = !S.canEdit;
-  $("#tab-pembayaran").hidden = !S.canEdit;
+  $$(".menu .mi").forEach((m) => { const f = m.dataset.for; m.hidden = f === "pengurus" ? !S.canEdit : f === "umum" ? S.canEdit : false; });
   const nBaru = S.pay.filter((p) => p.status === "baru").length;
-  $("#tab-pembayaran").textContent = "Donasi Masuk" + (nBaru ? " (" + nBaru + ")" : "");
+  $("#pay-badge").textContent = nBaru; $("#pay-badge").hidden = !nBaru;
   $("#btn-add").hidden = !S.canEdit;
+  $("#home-cta").textContent = S.canEdit ? "+ Catat uang masuk/keluar" : "Lihat laporan bulan ini";
+  const h = new Date().getHours();
+  $("#greet").textContent = (h < 11 ? "Selamat pagi" : h < 15 ? "Selamat siang" : h < 18 ? "Selamat sore" : "Selamat malam") + ",";
+  $("#st-date").textContent = "per " + fmtTgl(todayISO());
 
   const b = [];
   if (!S.db && S.dbChecked && window.kasAuth && window.kasAuth.configured) b.push(`<div class="banner"><div><b>Catatan belum bisa dibuka.</b> Periksa sambungan internet, lalu muat ulang halaman ini.</div></div>`);
   else if (S.stale && !S.confirmed) b.push(`<div class="banner"><div><b>Internet sedang lambat.</b> Angka di bawah mungkin belum yang terbaru.</div></div>`);
   if (S.offline) b.push(`<div class="banner"><div><b>Sambungan terputus.</b> Muat ulang halaman untuk melihat angka terbaru.</div></div>`);
-  if (hasContoh()) b.push(`<div class="banner info"><div><b>Ini masih contoh.</b> Angka di halaman ini hanya untuk memperlihatkan cara kerjanya, bukan uang sungguhan.${S.canEdit ? ` Hapus lewat <a href="#pengaturan" style="color:inherit;font-weight:600">Pengaturan</a> sebelum mulai mencatat.` : ""}</div></div>`);
   $("#banners").innerHTML = b.join("");
 
   const last = S.tx.reduce((m, t) => [t.dicatatPada, t.dibatalkanPada].reduce((mm, v) => (v && v > mm ? v : mm), m), "");
@@ -1175,7 +1246,7 @@ $("#s-save").addEventListener("click", async () => {
 let armTimer;
 $("#s-contoh-del").addEventListener("click", async (e) => {
   const b = e.currentTarget;
-  if (!b.classList.contains("armed")) { b.classList.add("armed"); b.textContent = "Tekan sekali lagi untuk menghapus " + S.tx.filter((t) => t.contoh).length + " catatan contoh"; clearTimeout(armTimer); armTimer = setTimeout(() => { b.classList.remove("armed"); b.textContent = "Hapus semua data contoh"; }, 5000); return; }
+  if (!b.classList.contains("armed")) { b.classList.add("armed"); b.textContent = "Tekan sekali lagi untuk menghapus " + S.tx.filter((t) => t.contoh).length + " catatan percobaan"; clearTimeout(armTimer); armTimer = setTimeout(() => { b.classList.remove("armed"); b.textContent = "Hapus semua data percobaan"; }, 5000); return; }
   clearTimeout(armTimer); b.disabled = true; b.textContent = "Menghapus…";
   const ids = S.tx.filter((t) => t.contoh).map((t) => t.id);
   try {
@@ -1183,9 +1254,9 @@ $("#s-contoh-del").addEventListener("click", async (e) => {
     const pids = S.pay.filter((p) => p.contoh).map((p) => p.id);
     for (let i = 0; i < pids.length; i += 8) await Promise.all(pids.slice(i, i + 8).map((id) => S.db.doc("pembayaran/" + id).delete()));
     for (const [yr, a] of Object.entries(S.anggaran)) if (a && a.contoh) await S.db.doc("anggaran/" + yr).delete();
-    toast("Data contoh sudah dihapus. Siap dipakai untuk mencatat uang sungguhan.");
-  } catch { toast("Sebagian data contoh gagal dihapus. Coba lagi."); }
-  b.disabled = false; b.classList.remove("armed"); b.textContent = "Hapus semua data contoh";
+    toast("Data percobaan sudah dihapus. Siap dipakai untuk mencatat uang sungguhan.");
+  } catch { toast("Sebagian data percobaan gagal dihapus. Coba lagi."); }
+  b.disabled = false; b.classList.remove("armed"); b.textContent = "Hapus semua data percobaan";
 });
 
 /* ---------- Routing & render ---------- */
@@ -1197,6 +1268,18 @@ try { if (localStorage.getItem("kt-guide-hidden") === "1") { $("#guide").hidden 
 $("#guide-close").addEventListener("click", () => setGuide(true));
 $("#guide-open").addEventListener("click", () => { setGuide(false); location.hash = "#ringkasan"; window.scrollTo(0, 0); });
 
+$(".menu").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-act]"); if (!b) return;
+  const act = b.dataset.act;
+  if (act === "catat") openTx();
+  else if (act === "pos") $("#sec-pos").scrollIntoView({ behavior: "smooth", block: "start" });
+  else if (act === "grafik") $("#sec-chart").scrollIntoView({ behavior: "smooth", block: "start" });
+  else if (act === "panduan") { setGuide(false); $("#guide").scrollIntoView({ behavior: "smooth", block: "center" }); }
+  else if (act === "wa") $("#l-copy").click();
+  else if (act === "excel") { if (S.downloads) $("#l-csv").click(); else toast("Unduhan belum siap. Coba lagi sebentar."); }
+});
+$("#home-cta").addEventListener("click", () => { if (S.canEdit) openTx(); else location.hash = "#laporan"; });
+
 const VIEWS = ["ringkasan", "buku-kas", "anggaran", "laporan", "pembayaran", "pengaturan"];
 function route() {
   let v = (location.hash || "").replace("#", "");
@@ -1204,6 +1287,11 @@ function route() {
   const changed = v !== S.view; S.view = v;
   VIEWS.forEach((x) => ($("#v-" + x).hidden = x !== v));
   $$("nav.tabs a").forEach((a) => { if (a.dataset.v === v) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+  const JUDUL = { "buku-kas": "Catatan Uang", anggaran: "Rencana Belanja", laporan: "Laporan Bulanan", pembayaran: "Donasi Masuk", pengaturan: "Pengaturan" };
+  const home = v === "ringkasan";
+  $("#back").hidden = home; $("#tb-app").hidden = !home; $("#page-title").hidden = home;
+  $("#page-title").textContent = JUDUL[v] || "";
+  if (changed) window.scrollTo(0, 0);
   if (changed && v === "pengaturan") renderPengaturan(true);
   renderView();
 }
