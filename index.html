@@ -16,9 +16,9 @@ code { font-size: .9em; }
 /* Layout: buku kas terbuka — header identitas rumah ibadah, tab tampilan, isi satu kolom lebar 1080px; angka rupiah selalu tabular. */
 /* Palet pengguna: Primary #675547 (cokelat kopi), Primary #E3BD90 (pasir), Neutral #E2D9BE (linen), Neutral #C1BDBC (abu hangat), Accent #6D6E35 (zaitun), Text #3B3B3B (arang). */
 :root {
-  --bg: #EFE9DA; --surface: #FAF7EF; --surface-2: #E2D9BE; --line: #D3CDC2;
-  --ink: #3B3B3B; --ink-2: #675547; --ink-3: #7A736C; --brand: #675547;
-  --accent: #6D6E35; --accent-ink: #FAF7EF; --accent-soft: #E6E4CC; --brass: #E3BD90;
+  --bg: #F6F2E8; --surface: #FFFDF8; --surface-2: #ECE5D0; --line: #DFD9CE;
+  --ink: #3B3B3B; --ink-2: #675547; --ink-3: #716A63; --brand: #675547;
+  --accent: #6D6E35; --accent-ink: #FFFDF8; --accent-soft: #EDEBD6; --brass: #E3BD90;
   --masuk: #6D6E35; --keluar: #C99A62;
   --good: #3D6B32; --good-bg: #E1E8D2; --warn: #87561A; --warn-bg: #F1E0C4; --bad: #A33B2C; --bad-bg: #F1D9D1;
   --shadow: 0 1px 2px rgba(59,59,59,.06), 0 6px 20px rgba(59,59,59,.07);
@@ -26,17 +26,17 @@ code { font-size: .9em; }
   --font-b: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #1F1C19; --surface: #282420; --surface-2: #342E28; --line: #463F38;
-  --ink: #ECE5D3; --ink-2: #D4C7B3; --ink-3: #A0988E; --brand: #E3BD90;
-  --accent: #B3B46A; --accent-ink: #1F1C19; --accent-soft: #35361F; --brass: #E3BD90;
+  --bg: #27231F; --surface: #322D28; --surface-2: #3F3832; --line: #534A42;
+  --ink: #F0E9D8; --ink-2: #D9CCB8; --ink-3: #ADA59B; --brand: #E3BD90;
+  --accent: #B3B46A; --accent-ink: #1F1C19; --accent-soft: #3C3D24; --brass: #E3BD90;
   --masuk: #A8A95E; --keluar: #E3BD90;
   --good: #9CC48A; --good-bg: #26331F; --warn: #E8B672; --warn-bg: #3A2D19; --bad: #EE927F; --bad-bg: #3D221C;
   --shadow: 0 1px 2px rgba(0,0,0,.3); color-scheme: dark;
 } }
 :root[data-theme="dark"] {
-  --bg: #1F1C19; --surface: #282420; --surface-2: #342E28; --line: #463F38;
-  --ink: #ECE5D3; --ink-2: #D4C7B3; --ink-3: #A0988E; --brand: #E3BD90;
-  --accent: #B3B46A; --accent-ink: #1F1C19; --accent-soft: #35361F; --brass: #E3BD90;
+  --bg: #27231F; --surface: #322D28; --surface-2: #3F3832; --line: #534A42;
+  --ink: #F0E9D8; --ink-2: #D9CCB8; --ink-3: #ADA59B; --brand: #E3BD90;
+  --accent: #B3B46A; --accent-ink: #1F1C19; --accent-soft: #3C3D24; --brass: #E3BD90;
   --masuk: #A8A95E; --keluar: #E3BD90;
   --good: #9CC48A; --good-bg: #26331F; --warn: #E8B672; --warn-bg: #3A2D19; --bad: #EE927F; --bad-bg: #3D221C;
   --shadow: 0 1px 2px rgba(0,0,0,.3); color-scheme: dark;
@@ -214,6 +214,7 @@ input.plafon { max-width: 160px; text-align: right; font-variant-numeric: tabula
 /* Laporan */
 .statement { display: grid; gap: 4px; }
 .statement .ln { display: flex; justify-content: space-between; gap: 16px; padding: 6px 0; font-variant-numeric: tabular-nums; }
+.statement .ln > span:last-child { white-space: nowrap; text-align: right; }
 .statement .ln.sub { padding-left: 16px; color: var(--ink-2); font-size: .9rem; }
 .statement .ln.tot { border-top: 1px solid var(--line); font-weight: 700; padding-top: 10px; }
 .statement .ln.grand { border-top: 2px solid var(--ink); font-weight: 700; font-size: 1.05rem; padding-top: 10px; }
@@ -265,6 +266,66 @@ footer { margin-top: 32px; color: var(--ink-3); font-size: .82rem; display: grid
   table.ledger tr.saldo-row { grid-template-columns: minmax(0, 1fr) auto; padding: 10px; background: var(--surface-2); }
   table.ledger tr.saldo-row td { background: none; }
   table.ledger tr.saldo-row td.uraian { grid-row: auto; }
+}
+/* ===== HP & tablet (di bawah 1024px): gaya aplikasi dengan navigasi bawah ===== */
+.side-brand, .side-only, .side-cta { display: none; }
+@media (max-width: 1023px) {
+  .topbar { position: sticky; top: 0; z-index: 10; background: var(--bg); margin-inline: -16px; padding-inline: 16px; }
+  nav.bottom-nav a svg { box-sizing: content-box; padding: 3px 16px; border-radius: 999px; }
+  nav.bottom-nav a[aria-current="page"] svg { background: var(--accent-soft); }
+  nav.bottom-nav a[aria-current="page"] { color: var(--ink); }
+  nav.bottom-nav a[aria-current="page"] svg { color: var(--accent); }
+  .toast { bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }
+}
+@media (max-width: 560px) {
+  /* Formulir muncul dari bawah layar */
+  .overlay { place-items: end stretch; padding: max(24px, env(safe-area-inset-top, 0px)) 0 0; }
+  .modal { width: 100%; max-height: 100%; border-radius: 22px 22px 0 0; padding: 14px 18px calc(22px + env(safe-area-inset-bottom, 0px)); }
+  .modal::before { content: ""; justify-self: center; width: 40px; height: 4px; border-radius: 2px; background: var(--line); }
+  .menu { padding: 16px 4px 4px; }
+  .ic { width: 52px; height: 52px; }
+  .ml { font-size: .78rem; }
+  .st-body .big { font-size: 2.1rem; }
+  footer { font-size: .78rem; }
+}
+
+/* ===== Desktop (1024px ke atas): menu samping dan beranda berkolom ===== */
+@media (min-width: 1024px) {
+  body { padding-left: calc(256px + 40px); padding-right: 40px; padding-bottom: 48px; }
+  .wrap { max-width: 1120px; }
+  nav.bottom-nav { top: 0; right: auto; width: 256px; display: flex; flex-direction: column; gap: 4px; border-top: 0; border-right: 1px solid var(--line); padding: 28px 16px 24px; overflow-y: auto; }
+  .side-brand { display: grid; gap: 2px; padding: 0 12px 24px; margin-bottom: 8px; border-bottom: 1px solid var(--line); }
+  .side-brand b { font-family: var(--font-d); font-size: 1.35rem; color: var(--brand); }
+  .side-brand span { font-size: .85rem; color: var(--ink-3); }
+  nav.bottom-nav a { grid-template-columns: 24px 1fr auto; justify-items: start; align-items: center; gap: 12px; padding: 10px 12px; font-size: .95rem; color: var(--ink-2); }
+  nav.bottom-nav a:hover { background: var(--bg); color: var(--ink); }
+  nav.bottom-nav a[aria-current="page"] { background: var(--accent-soft); color: var(--accent); }
+  .side-only { display: grid; }
+  .side-badge { min-width: 22px; height: 22px; padding: 0 6px; border-radius: 11px; background: var(--bad); color: var(--surface); font-size: .72rem; display: grid; place-items: center; }
+  .side-cta { display: block; margin-top: auto; border: 0; border-radius: 12px; padding: 13px 16px; background: var(--brass); color: var(--on-brass); font-weight: 700; font-size: .95rem; cursor: pointer; }
+  .side-cta:hover { filter: brightness(1.04); }
+
+  .topbar { padding-block: 22px 10px; }
+  .back, .tb-app { display: none; }
+  .tb-page { font-size: 1.7rem; }
+
+  .home { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 24px;
+    grid-template-areas: "hello hello" "menu menu" "status recent" "pos guide" "chart chart"; }
+  .home:has(#guide[hidden]) { grid-template-areas: "hello hello" "menu menu" "status recent" "pos pos" "chart chart"; }
+  .hello { grid-area: hello; }
+  .hello h1 { font-size: 2.8rem; }
+  .menu { grid-area: menu; grid-template-columns: repeat(8, minmax(0, 1fr)); padding: 22px 12px 10px; }
+  .status { grid-area: status; display: flex; flex-direction: column; }
+  .st-body { flex: 1; display: flex; flex-direction: column; gap: 10px; padding: 22px 26px 26px; }
+  .st-body .big { font-size: 3.2rem; }
+  .cta { margin-top: auto; }
+  .duo { display: contents; }
+  .duo > a.tile { grid-area: recent; }
+  .duo > .guide { grid-area: guide; align-self: start; }
+  #sec-pos { grid-area: pos; }
+  #sec-chart { grid-area: chart; }
+  .pos-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+  footer { margin-top: 40px; }
 }
 @media (prefers-reduced-motion: no-preference) { .btn, nav.tabs a { transition: color .15s, border-color .15s, background .15s; } }
 </style>
@@ -448,10 +509,14 @@ footer { margin-top: 32px; color: var(--ink-3); font-size: .82rem; display: grid
 </div>
 
 <nav class="tabs bottom-nav" aria-label="Menu utama">
+  <div class="side-brand"><b>Kas Terbuka</b><span id="side-nama"></span></div>
   <a href="#ringkasan" data-v="ringkasan"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7"/><path d="M6 9.5V20h12V9.5"/></svg><span>Beranda</span></a>
   <a href="#buku-kas" data-v="buku-kas"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3"/><path d="M9 7.5h6M9 11h6"/></svg><span>Catatan</span></a>
   <a href="#laporan" data-v="laporan"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h16"/><path d="M7 16v-5M12 16V7M17 16v-8"/></svg><span>Laporan</span></a>
   <a href="#anggaran" data-v="anggaran"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1"/><path d="M8.5 11l2 2 4-4"/><path d="M9 17h6"/></svg><span>Rencana</span></a>
+  <a href="#pembayaran" data-v="pembayaran" class="side-only" data-for="pengurus" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13l2.5-7h11L20 13v6H4z"/><path d="M4 13h4.5l1 2h5l1-2H20"/></svg><span>Donasi Masuk</span><b class="side-badge" id="side-pay-badge" hidden></b></a>
+  <a href="#pengaturan" data-v="pengaturan" class="side-only" data-for="pengurus" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg><span>Pengaturan</span></a>
+  <button type="button" class="side-cta" id="side-catat" hidden>+ Catat uang</button>
 </nav>
 <!-- Modal: catat uang -->
 <div class="overlay" id="m-tx" hidden>
@@ -670,6 +735,10 @@ function renderHeader() {
   $$(".menu .mi").forEach((m) => { const f = m.dataset.for; m.hidden = f === "pengurus" ? !S.canEdit : f === "umum" ? S.canEdit : false; });
   const nBaru = S.pay.filter((p) => p.status === "baru").length;
   $("#pay-badge").textContent = nBaru; $("#pay-badge").hidden = !nBaru;
+  $$("nav.tabs [data-for='pengurus']").forEach((a) => (a.hidden = !S.canEdit));
+  $("#side-catat").hidden = !S.canEdit;
+  $("#side-pay-badge").textContent = nBaru; $("#side-pay-badge").hidden = !nBaru;
+  $("#side-nama").textContent = c.nama || "";
   $("#btn-add").hidden = !S.canEdit;
   $("#home-cta").textContent = S.canEdit ? "+ Catat uang masuk/keluar" : "Lihat laporan bulan ini";
   const h = new Date().getHours();
@@ -1278,6 +1347,7 @@ $(".menu").addEventListener("click", (e) => {
   else if (act === "wa") $("#l-copy").click();
   else if (act === "excel") { if (S.downloads) $("#l-csv").click(); else toast("Unduhan belum siap. Coba lagi sebentar."); }
 });
+$("#side-catat").addEventListener("click", () => openTx());
 $("#home-cta").addEventListener("click", () => { if (S.canEdit) openTx(); else location.hash = "#laporan"; });
 
 const VIEWS = ["ringkasan", "buku-kas", "anggaran", "laporan", "pembayaran", "pengaturan"];
