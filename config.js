@@ -6,6 +6,6 @@
  *   JANGAN pernah memakai kunci "service_role" di sini.
  */
 window.KAS_CONFIG = {
-  supabaseUrl: "GANTI_DENGAN_PROJECT_URL",
-  supabaseAnonKey: "GANTI_DENGAN_ANON_KEY",
+  supabaseUrl: "https://uxadzdueucapwmcfzvde.supabase.co",
+  supabaseAnonKey: "sb_publishable_wIi7_p-nxusxWPJaSNpTAQ_DMTdnhze",
 };

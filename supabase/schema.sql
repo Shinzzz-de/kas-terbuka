@@ -130,6 +130,8 @@ drop policy if exists "pembayaran: hanya pengurus" on public.pembayaran;
 create policy "pembayaran: hanya pengurus" on public.pembayaran for all
   using (public.is_pengurus()) with check (public.is_pengurus());
 
+grant usage on schema public to anon, authenticated;
+grant execute on function public.is_pengurus() to anon, authenticated;
 grant select on public.pengurus, public.config, public.transaksi, public.anggaran to anon, authenticated;
 grant select, insert, update, delete on public.config, public.transaksi, public.anggaran, public.pembayaran to authenticated;
 
