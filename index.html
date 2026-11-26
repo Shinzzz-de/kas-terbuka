@@ -1,0 +1,1258 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Kas Terbuka</title>
+<meta name="description" content="Buku kas terbuka rumah ibadah: uang masuk, uang keluar, dan laporan bulanan yang bisa dilihat semua umat.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+<style>
+[hidden] { display: none !important; }
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; }
+img { max-width: 100%; }
+code { font-size: .9em; }
+/* Layout: buku kas terbuka — header identitas rumah ibadah, tab tampilan, isi satu kolom lebar 1080px; angka rupiah selalu tabular. */
+/* Palet pengguna: Primary #675547 (cokelat kopi), Primary #E3BD90 (pasir), Neutral #E2D9BE (linen), Neutral #C1BDBC (abu hangat), Accent #6D6E35 (zaitun), Text #3B3B3B (arang). */
+:root {
+  --bg: #EFE9DA; --surface: #FAF7EF; --surface-2: #E2D9BE; --line: #D3CDC2;
+  --ink: #3B3B3B; --ink-2: #675547; --ink-3: #7A736C; --brand: #675547;
+  --accent: #6D6E35; --accent-ink: #FAF7EF; --accent-soft: #E6E4CC; --brass: #E3BD90;
+  --masuk: #6D6E35; --keluar: #C99A62;
+  --good: #3D6B32; --good-bg: #E1E8D2; --warn: #87561A; --warn-bg: #F1E0C4; --bad: #A33B2C; --bad-bg: #F1D9D1;
+  --shadow: 0 1px 2px rgba(59,59,59,.06), 0 6px 20px rgba(59,59,59,.07);
+  --font-d: "Bricolage Grotesque", "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-b: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #1F1C19; --surface: #282420; --surface-2: #342E28; --line: #463F38;
+  --ink: #ECE5D3; --ink-2: #D4C7B3; --ink-3: #A0988E; --brand: #E3BD90;
+  --accent: #B3B46A; --accent-ink: #1F1C19; --accent-soft: #35361F; --brass: #E3BD90;
+  --masuk: #A8A95E; --keluar: #E3BD90;
+  --good: #9CC48A; --good-bg: #26331F; --warn: #E8B672; --warn-bg: #3A2D19; --bad: #EE927F; --bad-bg: #3D221C;
+  --shadow: 0 1px 2px rgba(0,0,0,.3); color-scheme: dark;
+} }
+:root[data-theme="dark"] {
+  --bg: #1F1C19; --surface: #282420; --surface-2: #342E28; --line: #463F38;
+  --ink: #ECE5D3; --ink-2: #D4C7B3; --ink-3: #A0988E; --brand: #E3BD90;
+  --accent: #B3B46A; --accent-ink: #1F1C19; --accent-soft: #35361F; --brass: #E3BD90;
+  --masuk: #A8A95E; --keluar: #E3BD90;
+  --good: #9CC48A; --good-bg: #26331F; --warn: #E8B672; --warn-bg: #3A2D19; --bad: #EE927F; --bad-bg: #3D221C;
+  --shadow: 0 1px 2px rgba(0,0,0,.3); color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-b); font-size: 16px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 48px; }
+.wrap { max-width: 1080px; margin: 0 auto; }
+h1, h2, h3 { font-family: var(--font-d); text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+h1 { font-size: clamp(1.5rem, 3.4vw, 2.1rem); line-height: 1.15; color: var(--brand); }
+h2 { font-size: 1.2rem; }
+h3 { font-size: 1rem; }
+.num, td.amt, .amt { font-variant-numeric: tabular-nums; }
+.muted { color: var(--ink-3); }
+.small { font-size: .85rem; }
+.lbl { font-size: .88rem; color: var(--ink-2); font-weight: 600; }
+.help { font-size: .92rem; color: var(--ink-2); margin: 2px 0 0; max-width: 72ch; }
+.sec-head { display: grid; gap: 4px; margin-bottom: 12px; }
+.guide ul { margin: 8px 0 0; padding-left: 20px; display: grid; gap: 6px; color: var(--ink-2); max-width: 80ch; }
+.guide a { color: var(--accent); font-weight: 600; }
+.dt-help { display: block; font-size: .8rem; color: var(--ink-3); font-weight: 400; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Header */
+header.top { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: flex-end; justify-content: space-between; padding-block: 28px 18px; }
+.top .id { min-width: 0; display: grid; gap: 4px; }
+.top .sub { color: var(--ink-2); }
+.role { display: inline-flex; align-items: center; gap: 8px; font-size: .88rem; color: var(--ink-2); }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ink-3); flex: none; }
+.role.editor .dot { background: var(--accent); }
+
+/* Tabs */
+nav.tabs { display: flex; gap: 4px; overflow-x: auto; border-bottom: 1px solid var(--line); margin-bottom: 20px; scrollbar-width: none; }
+nav.tabs a { padding: 10px 14px; text-decoration: none; color: var(--ink-2); font-weight: 600; border-bottom: 2px solid transparent; white-space: nowrap; margin-bottom: -1px; }
+nav.tabs a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--accent); }
+nav.tabs a:hover { color: var(--ink); }
+
+/* Generic */
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; min-width: 0; }
+.stack { display: grid; gap: 20px; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.between { justify-content: space-between; }
+.btn { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--surface); padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: .9rem; }
+.btn:hover { border-color: var(--ink-3); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn.primary:hover { filter: brightness(1.06); }
+.btn.danger { color: var(--bad); }
+.btn.danger.armed { background: var(--bad); color: var(--surface); border-color: var(--bad); }
+.btn[disabled] { opacity: .5; cursor: not-allowed; }
+.linkbtn { background: none; border: 0; padding: 0; color: var(--accent); cursor: pointer; font-weight: 600; font-size: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.chip { display: inline-flex; align-items: center; gap: 4px; padding: 1px 6px; border-radius: 4px; font-size: .75rem; font-weight: 600; background: var(--surface-2); color: var(--ink-2); white-space: nowrap; }
+.chip.good { background: var(--good-bg); color: var(--good); }
+.chip.warn { background: var(--warn-bg); color: var(--warn); }
+.chip.bad { background: var(--bad-bg); color: var(--bad); }
+.chip.lock { background: var(--accent-soft); color: var(--accent); }
+.banner { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 10px; background: var(--warn-bg); color: var(--ink); font-size: .9rem; margin-bottom: 18px; }
+.banner b { color: var(--warn); }
+.banner.info { background: var(--accent-soft); }
+.banner.info b { color: var(--accent); }
+label.f { display: grid; gap: 4px; font-size: .85rem; font-weight: 600; color: var(--ink-2); min-width: 0; }
+input.i, select.i, textarea.i { width: 100%; padding: 9px 11px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); font-weight: 500; color: var(--ink); }
+textarea.i { resize: vertical; min-height: 120px; }
+input.i:focus, select.i:focus, textarea.i:focus { border-color: var(--accent); outline: 1px solid var(--accent); outline-offset: 0; }
+
+/* Ringkasan */
+.summary { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 20px 32px; }
+.sum-total { display: grid; gap: 4px; align-content: start; }
+.sum-total .big { font-family: var(--font-d); font-size: clamp(1.7rem, 4vw, 2.3rem); line-height: 1.1; font-variant-numeric: tabular-nums; font-weight: 700; overflow-wrap: anywhere; }
+.sum-total .meta { font-size: .88rem; color: var(--ink-3); }
+.sum-month { margin: 0; display: grid; }
+.sum-month .ln { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.sum-month .ln:last-child { border-bottom: 0; }
+.sum-month dt { color: var(--ink-2); }
+.sum-month dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
+.sum-month dd small { display: block; font-weight: 400; font-size: .8rem; color: var(--ink-3); }
+.sum-month .ln.head dt { font-family: var(--font-d); font-weight: 700; color: var(--ink); font-size: 1.05rem; }
+.sum-month .ln.head dd { font-weight: 400; color: var(--ink-3); font-size: .88rem; }
+.swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; vertical-align: -1px; margin-right: 6px; }
+.pos-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
+.pos { display: grid; gap: 8px; }
+.pos .v { font-family: var(--font-d); font-size: 1.35rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.pos .flow { display: flex; gap: 14px; font-size: .82rem; color: var(--ink-2); flex-wrap: wrap; }
+.pos .note { font-size: .8rem; color: var(--ink-3); }
+.pos.neg .v { color: var(--bad); }
+.two { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 20px; }
+.chart-wrap { position: relative; }
+.chart-wrap svg { display: block; width: 100%; }
+.legend { display: flex; gap: 16px; font-size: .85rem; color: var(--ink-2); flex-wrap: wrap; }
+.tip { position: absolute; pointer-events: none; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); border-radius: 8px; padding: 8px 10px; font-size: .82rem; min-width: 170px; z-index: 3; }
+.tip .r { display: flex; justify-content: space-between; gap: 14px; font-variant-numeric: tabular-nums; }
+details.tbl summary { cursor: pointer; font-size: .85rem; color: var(--accent); font-weight: 600; margin-top: 10px; }
+.recent { display: grid; gap: 2px; }
+.recent .it { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.recent .it:last-child { border-bottom: 0; }
+.recent .it .a { font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
+.recent .it .m { font-size: .8rem; color: var(--ink-3); grid-column: 1 / -1; }
+
+/* Tables */
+.scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+th { text-align: left; font-size: .85rem; color: var(--ink-2); font-weight: 600; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+td { padding: 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th.r, td.r { text-align: right; }
+td.amt { white-space: nowrap; }
+tr.saldo-row td { background: var(--surface-2); font-weight: 700; }
+tr.void td { color: var(--ink-3); }
+tr.void td.amt { text-decoration: line-through; }
+.ux { display: grid; gap: 3px; }
+.ux .t { font-weight: 600; color: var(--ink); }
+tr.void .ux .t { color: var(--ink-3); }
+.ux .m { font-size: .78rem; color: var(--ink-3); display: flex; gap: 4px 10px; flex-wrap: wrap; align-items: center; }
+.voidnote { font-size: .78rem; color: var(--bad); }
+
+/* Ledger filters */
+.filters { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)) auto; gap: 10px; align-items: end; margin-bottom: 14px; }
+
+/* Anggaran */
+.meter { position: relative; height: 10px; background: var(--surface-2); border-radius: 2px; overflow: hidden; min-width: 120px; }
+.meter > i { position: absolute; inset: 0 auto 0 0; border-radius: 2px; }
+.meter > i.good { background: var(--good); } .meter > i.warn { background: var(--warn); } .meter > i.bad { background: var(--bad); }
+.meter > b { position: absolute; top: -2px; bottom: -2px; width: 2px; background: var(--ink-2); }
+input.plafon { max-width: 160px; text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Laporan */
+.statement { display: grid; gap: 4px; }
+.statement .ln { display: flex; justify-content: space-between; gap: 16px; padding: 6px 0; font-variant-numeric: tabular-nums; }
+.statement .ln.sub { padding-left: 16px; color: var(--ink-2); font-size: .9rem; }
+.statement .ln.tot { border-top: 1px solid var(--line); font-weight: 700; padding-top: 10px; }
+.statement .ln.grand { border-top: 2px solid var(--ink); font-weight: 700; font-size: 1.05rem; padding-top: 10px; }
+
+/* Settings */
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.posrow { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto minmax(0, 1.6fr) auto; gap: 8px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.posrow label.cb { display: flex; gap: 6px; align-items: center; font-size: .85rem; white-space: nowrap; }
+
+/* Modal */
+.overlay { position: fixed; inset: 0; background: rgba(32,27,22,.55); display: grid; place-items: center; z-index: 20;
+  padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.modal { background: var(--surface); border-radius: 14px; width: min(560px, 100%); max-height: 100%; overflow: auto; padding: 22px; display: grid; gap: 14px; box-shadow: 0 20px 60px rgba(0,0,0,.3); }
+.seg { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.seg label { text-align: center; padding: 10px; cursor: pointer; font-weight: 600; color: var(--ink-2); }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg label:has(input:checked) { background: var(--accent); color: var(--accent-ink); }
+.seg label:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: -3px; }
+.warnline { font-size: .85rem; color: var(--warn); background: var(--warn-bg); padding: 8px 10px; border-radius: 8px; }
+.errline { font-size: .85rem; color: var(--bad); }
+.bukti-img { max-width: 100%; max-height: 70vh; border-radius: 8px; display: block; margin: 0 auto; }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(20px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 10px; font-size: .9rem; z-index: 30; box-shadow: var(--shadow); max-width: calc(100% - 32px); }
+.empty { padding: 24px 0; color: var(--ink-2); display: grid; gap: 6px; }
+.empty h3 { color: var(--ink); }
+footer { margin-top: 32px; color: var(--ink-3); font-size: .82rem; display: grid; gap: 4px; }
+
+@media (max-width: 860px) {
+  .summary, .two { grid-template-columns: minmax(0, 1fr); }
+  .filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .filters .add { grid-column: 1 / -1; }
+}
+@media (max-width: 560px) {
+  .grid2 { grid-template-columns: minmax(0, 1fr); }
+  .posrow { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .posrow .ket { grid-column: 1 / -1; }
+  /* Buku kas sebagai kartu */
+  table.ledger thead { display: none; }
+  table.ledger, table.ledger tbody, table.ledger tr, table.ledger td { display: block; }
+  table.ledger tr { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  table.ledger td { border: 0; padding: 0; }
+  table.ledger td.tgl { grid-column: 1 / -1; font-size: .78rem; color: var(--ink-3); }
+  table.ledger td.uraian { grid-column: 1; grid-row: 2 / span 2; }
+  table.ledger td.amt.empty-amt { display: none; }
+  table.ledger td.saldo { font-size: .78rem; color: var(--ink-3); }
+  table.ledger td.saldo::before { content: "Sisa uang "; }
+  table.ledger td.act { grid-column: 1 / -1; }
+  table.ledger tr.saldo-row { grid-template-columns: 1fr auto; padding: 10px; background: var(--surface-2); }
+  table.ledger tr.saldo-row td { background: none; }
+  table.ledger tr.saldo-row td.uraian { grid-row: auto; }
+}
+@media (prefers-reduced-motion: no-preference) { .btn, nav.tabs a { transition: color .15s, border-color .15s, background .15s; } }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="id">
+      <h1 id="h-nama">Kas rumah ibadah</h1>
+      <span class="sub" id="h-alamat"></span>
+    </div>
+    <div class="row"><span class="role" id="h-role"><span class="dot"></span><span id="h-role-t">Memuat…</span></span>
+  <button class="btn" id="auth-btn" type="button" hidden>Masuk sebagai pengurus</button></div>
+  </header>
+
+  <nav class="tabs" aria-label="Tampilan">
+    <a href="#ringkasan" data-v="ringkasan">Beranda</a>
+    <a href="#buku-kas" data-v="buku-kas">Catatan Uang</a>
+    <a href="#anggaran" data-v="anggaran">Rencana Belanja</a>
+    <a href="#laporan" data-v="laporan">Laporan Bulanan</a>
+    <a href="#pembayaran" data-v="pembayaran" id="tab-pembayaran" hidden>Donasi Masuk</a>
+    <a href="#pengaturan" data-v="pengaturan" id="tab-pengaturan" hidden>Pengaturan</a>
+  </nav>
+
+  <div id="auth-note"></div>
+  <div id="banners"></div>
+
+  <!-- BERANDA -->
+  <section id="v-ringkasan" class="stack">
+    <div class="panel guide" id="guide">
+      <div class="row between"><h2>Cara membaca halaman ini</h2><button class="linkbtn" id="guide-close" type="button">Sembunyikan</button></div>
+      <ul>
+        <li><b>Uang yang tersedia</b> adalah seluruh uang rumah ibadah saat ini, baik tunai di kas maupun di rekening.</li>
+        <li>Uang dibagi ke beberapa <b>kantong dana</b> sesuai tujuannya. Kantong bertanda <b>Khusus</b> hanya boleh dipakai untuk keperluan yang diminta pemberinya.</li>
+        <li>Setiap uang masuk dan keluar dicatat di <a href="#buku-kas">Catatan Uang</a> beserta nama pencatatnya. Catatan tidak bisa dihapus. Jika ada salah catat, catatan itu dibatalkan dengan alasan yang bisa dibaca semua orang.</li>
+      </ul>
+    </div>
+
+    <div class="panel summary">
+      <div class="sum-total">
+        <span class="lbl">Uang yang tersedia saat ini</span>
+        <div class="big" id="r-total">Rp —</div>
+        <div class="meta" id="r-total-meta">Sedang memuat catatan…</div>
+      </div>
+      <dl class="sum-month">
+        <div class="ln head"><dt id="r-bulan-t">Bulan ini</dt><dd id="r-bulan-n"></dd></div>
+        <div class="ln"><dt><span class="swatch" style="background:var(--masuk)"></span>Uang masuk</dt><dd><span id="r-masuk">Rp 0</span><small id="r-masuk-d"></small></dd></div>
+        <div class="ln"><dt><span class="swatch" style="background:var(--keluar)"></span>Uang keluar</dt><dd><span id="r-keluar">Rp 0</span><small id="r-keluar-d"></small></dd></div>
+        <div class="ln"><dt>Sisa bulan ini<small class="dt-help">Uang masuk dikurangi uang keluar</small></dt><dd><span id="r-selisih">Rp 0</span><small id="r-selisih-d"></small></dd></div>
+      </dl>
+    </div>
+
+    <div>
+      <div class="sec-head"><h2>Uang per kantong dana</h2><p class="help">Jumlah uang di tiap kantong saat ini. Kantong <b>Khusus</b> hanya boleh dipakai untuk keperluan yang tertulis di bawahnya.</p></div>
+      <div class="pos-grid" id="r-pos"></div>
+    </div>
+
+    <div class="two">
+      <div class="panel">
+        <div class="sec-head">
+          <h2>Uang masuk dan keluar, 6 bulan terakhir</h2>
+          <div class="legend"><span><span class="swatch" style="background:var(--masuk)"></span>Uang masuk</span><span><span class="swatch" style="background:var(--keluar)"></span>Uang keluar</span></div>
+        </div>
+        <div class="chart-wrap" id="r-chart"></div>
+        <p class="help" id="r-chart-note"></p>
+        <details class="tbl"><summary>Lihat angkanya dalam tabel</summary><div class="scroll" id="r-chart-table"></div></details>
+      </div>
+      <div class="panel">
+        <div class="row between" style="margin-bottom:4px"><h2>Catatan terbaru</h2><a class="small" href="#buku-kas" style="color:var(--accent);font-weight:600">Lihat semua catatan</a></div>
+        <div class="recent" id="r-recent"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CATATAN UANG -->
+  <section id="v-buku-kas" hidden>
+    <div class="panel">
+      <div class="sec-head"><h2>Catatan uang masuk dan keluar</h2><p class="help">Pilih bulan untuk melihat catatannya. Kolom <b>Sisa uang</b> menunjukkan jumlah uang setelah setiap catatan.</p></div>
+      <div class="filters">
+        <label class="f">Bulan<select class="i" id="f-bulan"></select></label>
+        <label class="f">Kantong dana<select class="i" id="f-pos"></select></label>
+        <label class="f">Tampilkan<select class="i" id="f-jenis"><option value="">Uang masuk dan keluar</option><option value="masuk">Uang masuk saja</option><option value="keluar">Uang keluar saja</option></select></label>
+        <label class="f">Cari<input class="i" id="f-cari" type="search" placeholder="Misalnya: listrik"></label>
+        <div class="add"><button class="btn primary" id="btn-add" hidden type="button">+ Catat uang masuk/keluar</button></div>
+      </div>
+      <div class="scroll" id="ledger"></div>
+    </div>
+  </section>
+
+  <!-- RENCANA BELANJA -->
+  <section id="v-anggaran" class="stack" hidden>
+    <div class="panel">
+      <div class="row between" style="margin-bottom:10px;align-items:flex-end">
+        <div class="sec-head" style="margin:0"><h2>Rencana belanja</h2><p class="help">Pengurus menentukan batas belanja setahun untuk setiap keperluan. Bar menunjukkan berapa bagian yang sudah terpakai.</p></div>
+        <label class="f" style="min-width:120px">Tahun<select class="i" id="a-tahun"></select></label>
+      </div>
+      <div class="scroll" id="a-body"></div>
+      <div class="row" id="a-actions" hidden style="margin-top:14px"><button class="btn primary" id="a-save" type="button">Simpan rencana</button><span class="small muted" id="a-dirty"></span></div>
+    </div>
+  </section>
+
+  <!-- LAPORAN -->
+  <section id="v-laporan" class="stack" hidden>
+    <div class="panel">
+      <div class="row between" style="margin-bottom:14px;align-items:flex-end">
+        <label class="f" style="min-width:180px">Pilih bulan<select class="i" id="l-bulan"></select></label>
+        <div class="row">
+          <button class="btn" id="l-copy" type="button">Salin teks untuk WhatsApp</button>
+          <button class="btn" id="l-csv" type="button" hidden>Unduh untuk Excel</button>
+          <button class="btn" id="l-csv-all" type="button" hidden>Unduh semua catatan</button>
+        </div>
+      </div>
+      <div id="l-body"></div>
+    </div>
+  </section>
+
+  <!-- DONASI MASUK -->
+  <section id="v-pembayaran" class="stack" hidden>
+    <div class="banner info"><div><b>Masih percobaan.</b> Menu ini belum tersambung ke QRIS, bank, atau dompet digital. Untuk sekarang, pengurus mengetik sendiri donasi yang masuk, memeriksanya, lalu memasukkannya ke Catatan Uang. Menu ini hanya terlihat oleh pengurus.</div></div>
+    <div class="panel">
+      <div class="sec-head"><h2>Donasi yang masuk lewat transfer</h2><p class="help">Periksa setiap donasi dengan notifikasi bank atau QRIS. Jika cocok, tekan <b>Masukkan ke catatan</b>.</p></div>
+      <div class="filters" style="grid-template-columns:repeat(2,minmax(0,1fr)) auto">
+        <label class="f">Tampilkan<select class="i" id="p-status"><option value="baru">Belum diperiksa</option><option value="dicatat">Sudah masuk catatan</option><option value="diabaikan">Diabaikan</option><option value="">Semua</option></select></label>
+        <label class="f">Cara bayar<select class="i" id="p-metode"><option value="">Semua cara bayar</option><option>QRIS</option><option>Transfer bank</option><option>Virtual account</option><option>Dompet digital</option></select></label>
+        <div class="add"><button class="btn primary" id="p-add" type="button">+ Tambah donasi masuk</button></div>
+      </div>
+      <p class="small" id="p-sum" style="margin:0 0 10px"></p>
+      <div class="scroll" id="p-list"></div>
+    </div>
+  </section>
+
+  <!-- PENGATURAN -->
+  <section id="v-pengaturan" class="stack" hidden>
+    <div class="panel stack">
+      <h2>Identitas rumah ibadah</h2>
+      <div class="grid2">
+        <label class="f">Nama<input class="i" id="s-nama" maxlength="80"></label>
+        <label class="f">Jenis<select class="i" id="s-jenis">
+          <option>Masjid</option><option>Musala</option><option>Gereja</option><option>Pura</option><option>Vihara</option><option>Klenteng</option><option>Rumah ibadah</option>
+        </select></label>
+        <label class="f">Alamat<input class="i" id="s-alamat" maxlength="140"></label>
+        <label class="f">Mulai dicatat sejak tanggal<input class="i" id="s-tgl" type="date"></label>
+      </div>
+    </div>
+    <div class="panel stack">
+      <div class="sec-head" style="margin:0"><h2>Kantong dana</h2><p class="help">Pisahkan uang sesuai tujuan pemberinya. Isi <b>uang awal</b> dengan jumlah uang di kantong itu pada tanggal mulai dicatat. Centang <b>Khusus</b> untuk uang yang hanya boleh dipakai untuk satu keperluan, misalnya pembangunan.</p></div>
+      <div id="s-pos"></div>
+      <div><button class="btn" id="s-pos-add" type="button">+ Tambah kantong dana</button></div>
+    </div>
+    <div class="panel stack">
+      <div class="sec-head" style="margin:0"><h2>Jenis uang masuk dan keluar</h2><p class="help">Pilihan yang muncul saat mencatat. Tulis satu jenis per baris.</p></div>
+      <div class="grid2">
+        <label class="f">Jenis uang masuk<textarea class="i" id="s-katmasuk"></textarea></label>
+        <label class="f">Jenis uang keluar<textarea class="i" id="s-katkeluar"></textarea></label>
+      </div>
+    </div>
+    <div class="row"><button class="btn primary" id="s-save" type="button">Simpan pengaturan</button><span class="small muted" id="s-msg"></span></div>
+    <div class="panel stack" id="s-contoh" hidden>
+      <div class="sec-head" style="margin:0"><h2>Data contoh</h2><p class="help">Catatan yang tampil sekarang masih contoh. Hapus dulu sebelum mulai mencatat uang sungguhan. Pengaturan di atas tidak ikut terhapus.</p></div>
+      <div><button class="btn danger" id="s-contoh-del" type="button">Hapus semua data contoh</button></div>
+    </div>
+  </section>
+
+  <footer id="foot">
+    <span>Semua catatan di halaman ini bisa dibaca oleh siapa saja yang membuka halaman ini. Catatan tidak pernah dihapus. Jika ada salah catat, catatan itu dibatalkan dengan alasan, dan pembatalannya tetap terlihat.</span>
+    <span id="foot-upd"></span>
+    <span><button type="button" class="linkbtn" id="guide-open" hidden>Tampilkan lagi cara membaca halaman ini</button></span>
+  </footer>
+</div>
+
+<!-- Modal: catat uang -->
+<div class="overlay" id="m-tx" hidden>
+  <form class="modal" id="tx-form" novalidate>
+    <div class="row between"><h2 id="tx-title">Catat uang</h2><button type="button" class="linkbtn" data-close>Tutup</button></div>
+    <div class="seg" role="radiogroup" aria-label="Uang masuk atau keluar">
+      <label><input type="radio" name="jenis" value="masuk" id="tx-masuk" checked>Uang masuk</label>
+      <label><input type="radio" name="jenis" value="keluar" id="tx-keluar">Uang keluar</label>
+    </div>
+    <div class="grid2">
+      <label class="f">Tanggal<input class="i" type="date" id="tx-tgl" required></label>
+      <label class="f">Jumlah (Rp)<input class="i" id="tx-jumlah" inputmode="numeric" autocomplete="off" placeholder="0" required></label>
+      <label class="f"><span id="tx-pos-l">Masuk ke kantong</span><select class="i" id="tx-pos"></select></label>
+      <label class="f">Jenis<select class="i" id="tx-kat"></select></label>
+    </div>
+    <label class="f">Keterangan singkat<input class="i" id="tx-uraian" maxlength="160" placeholder="Misalnya: Kotak amal ibadah pekan ke-4" required></label>
+    <div class="grid2">
+      <label class="f"><span id="tx-pihak-l">Diterima dari</span><input class="i" id="tx-pihak" maxlength="100" placeholder="Nama donatur, atau kosongkan"></label>
+      <label class="f">Cara bayar<select class="i" id="tx-metode"><option>Tunai</option><option>Transfer bank</option><option>QRIS</option><option>Lainnya</option></select></label>
+    </div>
+    <label class="f" id="tx-bukti-wrap" hidden>Foto nota atau kuitansi (boleh dikosongkan)<input class="i" type="file" id="tx-bukti" accept="image/*,application/pdf"></label>
+    <div class="warnline" id="tx-warn" hidden></div>
+    <div class="errline" id="tx-err" hidden></div>
+    <div class="row" style="justify-content:flex-end"><button type="button" class="btn" data-close>Batal</button><button type="submit" class="btn primary" id="tx-submit">Simpan catatan</button></div>
+  </form>
+</div>
+
+<!-- Modal: tambah donasi masuk -->
+<div class="overlay" id="m-pay" hidden>
+  <form class="modal" id="pay-form" novalidate>
+    <div class="row between"><h2>Tambah donasi masuk</h2><button type="button" class="linkbtn" data-close>Tutup</button></div>
+    <p class="small muted" style="margin:0">Salin dari notifikasi QRIS, mutasi rekening, atau aplikasi dompet digital. Jangan isi nomor rekening, PIN, atau kata sandi.</p>
+    <div class="grid2">
+      <label class="f">Tanggal<input class="i" type="date" id="pay-tgl"></label>
+      <label class="f">Jam<input class="i" type="time" id="pay-jam"></label>
+      <label class="f">Cara bayar<select class="i" id="pay-metode"><option>QRIS</option><option>Transfer bank</option><option>Virtual account</option><option>Dompet digital</option></select></label>
+      <label class="f">Jumlah (Rp)<input class="i" id="pay-jumlah" inputmode="numeric" autocomplete="off" placeholder="0"></label>
+      <label class="f">Nama pengirim<input class="i" id="pay-pengirim" maxlength="100" placeholder="Kosongkan jika tanpa nama"></label>
+      <label class="f">Nomor transaksi (dari notifikasi)<input class="i" id="pay-ref" maxlength="40" placeholder="Misalnya QR2611-0042"></label>
+    </div>
+    <label class="f">Pesan dari pengirim<input class="i" id="pay-catatan" maxlength="140" placeholder="Misalnya: untuk renovasi atap"></label>
+    <div class="errline" id="pay-err" hidden></div>
+    <div class="row" style="justify-content:flex-end"><button type="button" class="btn" data-close>Batal</button><button type="submit" class="btn primary">Simpan donasi</button></div>
+  </form>
+</div>
+
+<!-- Modal: masukkan donasi ke catatan -->
+<div class="overlay" id="m-match" hidden>
+  <form class="modal" id="match-form" novalidate>
+    <div class="row between"><h2>Masukkan ke catatan uang</h2><button type="button" class="linkbtn" data-close>Tutup</button></div>
+    <p class="small" id="match-desc" style="margin:0"></p>
+    <div class="grid2">
+      <label class="f">Masuk ke kantong<select class="i" id="match-pos"></select></label>
+      <label class="f">Jenis<select class="i" id="match-kat"></select></label>
+    </div>
+    <label class="f">Keterangan singkat<input class="i" id="match-uraian" maxlength="160"></label>
+    <div class="errline" id="match-err" hidden></div>
+    <div class="row" style="justify-content:flex-end"><button type="button" class="btn" data-close>Batal</button><button type="submit" class="btn primary" id="match-submit">Masukkan ke catatan</button></div>
+  </form>
+</div>
+
+<!-- Modal: batalkan -->
+<div class="overlay" id="m-void" hidden>
+  <form class="modal" id="void-form" novalidate>
+    <h2>Batalkan catatan ini?</h2>
+    <p class="small" id="void-desc" style="margin:0"></p>
+    <p class="small muted" style="margin:0">Catatan yang dibatalkan tidak dihitung lagi, tetapi tetap terlihat dicoret beserta alasannya. Jika jumlahnya salah, batalkan lalu catat ulang dengan jumlah yang benar.</p>
+    <label class="f">Kenapa dibatalkan?<textarea class="i" id="void-alasan" style="min-height:80px" maxlength="200" placeholder="Misalnya: Salah ketik jumlah, seharusnya Rp 1.250.000"></textarea></label>
+    <div class="errline" id="void-err" hidden></div>
+    <div class="row" style="justify-content:flex-end"><button type="button" class="btn" data-close>Kembali</button><button type="submit" class="btn danger armed">Ya, batalkan</button></div>
+  </form>
+</div>
+
+<!-- Modal: bukti -->
+<div class="overlay" id="m-bukti" hidden>
+  <div class="modal" style="width:min(760px,100%)">
+    <div class="row between"><h2>Foto nota</h2><button type="button" class="linkbtn" data-close>Tutup</button></div>
+    <div id="bukti-body"></div>
+  </div>
+</div>
+
+<!-- Modal: masuk pengurus -->
+<div class="overlay" id="m-login" hidden>
+  <form class="modal" id="login-form" novalidate>
+    <div class="row between"><h2>Masuk sebagai pengurus</h2><button type="button" class="linkbtn" data-close>Tutup</button></div>
+    <p class="small muted" style="margin:0">Kami akan mengirim tautan masuk ke email Anda. Tidak perlu kata sandi. Hanya email yang sudah didaftarkan sebagai pengurus yang bisa mencatat uang.</p>
+    <label class="f">Email<input class="i" type="email" id="login-email" autocomplete="email" placeholder="nama@contoh.com"></label>
+    <div class="errline" id="login-err" hidden></div>
+    <div class="warnline" id="login-ok" hidden style="color:var(--good);background:var(--good-bg)"></div>
+    <div class="row" style="justify-content:flex-end"><button type="button" class="btn" data-close>Batal</button><button type="submit" class="btn primary" id="login-submit">Kirim tautan masuk</button></div>
+  </form>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
+<script src="supabase-adapter.js"></script>
+<script>
+(() => {
+"use strict";
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const BULAN = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+const BLN = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+const rp = (n) => (n < 0 ? "−" : "") + "Rp " + Math.abs(Math.round(n || 0)).toLocaleString("id-ID");
+const rpShort = (n) => {
+  const a = Math.abs(n);
+  if (a >= 1e9) return (n / 1e9).toLocaleString("id-ID", { maximumFractionDigits: 1 }) + " M";
+  if (a >= 1e6) return (n / 1e6).toLocaleString("id-ID", { maximumFractionDigits: 1 }) + " jt";
+  if (a >= 1e3) return (n / 1e3).toLocaleString("id-ID", { maximumFractionDigits: 0 }) + " rb";
+  return String(n);
+};
+const pad = (n) => String(n).padStart(2, "0");
+const todayISO = () => { const d = new Date(); return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); };
+const fmtTgl = (iso) => { if (!iso) return ""; const [y, m, d] = iso.slice(0, 10).split("-").map(Number); return d + " " + BLN[m - 1] + " " + y; };
+const fmtBulan = (key) => { const [y, m] = key.split("-").map(Number); return BULAN[m - 1] + " " + y; };
+const fmtWaktu = (iso) => { try { const d = new Date(iso); return fmtTgl(d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate())) + ", " + pad(d.getHours()) + "." + pad(d.getMinutes()); } catch { return ""; } };
+const parseRp = (s) => Number(String(s || "").replace(/[^\d]/g, "")) || 0;
+const clone = (o) => JSON.parse(JSON.stringify(o));
+const thisMonth = () => todayISO().slice(0, 7);
+const addMonths = (key, k) => { let [y, m] = key.split("-").map(Number); m += k; while (m < 1) { m += 12; y--; } while (m > 12) { m -= 12; y++; } return y + "-" + pad(m); };
+
+const DEFAULT_CFG = {
+  nama: "Kas rumah ibadah", jenis: "Rumah ibadah", alamat: "", tanggalSaldoAwal: todayISO().slice(0, 4) + "-01-01",
+  pos: [
+    { id: "umum", nama: "Kas Umum", saldoAwal: 0, terikat: false, ket: "Operasional harian dan kegiatan rutin" },
+    { id: "pembangunan", nama: "Dana Pembangunan", saldoAwal: 0, terikat: true, ket: "Hanya untuk pembangunan dan renovasi" },
+    { id: "sosial", nama: "Dana Sosial", saldoAwal: 0, terikat: true, ket: "Santunan yatim, duafa, dan bencana" }
+  ],
+  katMasuk: ["Kotak amal / persembahan", "Donasi perorangan", "Donasi lembaga", "Perayaan hari besar", "Sewa fasilitas", "Lainnya"],
+  katKeluar: ["Listrik, air & internet", "Kebersihan & perawatan", "Honor petugas", "Kegiatan ibadah", "Santunan & sosial", "Pembangunan & renovasi", "Perlengkapan", "Administrasi", "Lainnya"]
+};
+function normCfg(d) {
+  const c = Object.assign(clone(DEFAULT_CFG), d || {});
+  if (!Array.isArray(c.pos) || !c.pos.length) c.pos = clone(DEFAULT_CFG.pos);
+  c.pos = c.pos.map((p) => ({ id: String(p.id || ""), nama: String(p.nama || "Pos"), saldoAwal: Number(p.saldoAwal) || 0, terikat: !!p.terikat, ket: String(p.ket || "") }));
+  if (!Array.isArray(c.katMasuk) || !c.katMasuk.length) c.katMasuk = clone(DEFAULT_CFG.katMasuk);
+  if (!Array.isArray(c.katKeluar) || !c.katKeluar.length) c.katKeluar = clone(DEFAULT_CFG.katKeluar);
+  return c;
+}
+
+const S = {
+  cfg: normCfg(null), tx: [], anggaran: {}, pay: [], payLoaded: false, txLoaded: false, confirmed: false, stale: false, offline: false,
+  canEdit: false, myId: null, db: null, user: null, assets: null, downloads: null,
+  view: "ringkasan", settingsDirty: false, budgetDirty: false, budgetDraft: null,
+};
+
+/* ---------- Derived ---------- */
+const active = () => S.tx.filter((t) => t.status !== "batal");
+const cmpTx = (a, b) => (a.tanggal < b.tanggal ? -1 : a.tanggal > b.tanggal ? 1 : (a.dicatatPada || "") < (b.dicatatPada || "") ? -1 : (a.dicatatPada || "") > (b.dicatatPada || "") ? 1 : 0);
+const posById = (id) => S.cfg.pos.find((p) => p.id === id);
+const posNama = (id) => (posById(id) || {}).nama || id || "—";
+const saldoAwalTotal = (posId) => S.cfg.pos.filter((p) => !posId || p.id === posId).reduce((s, p) => s + (Number(p.saldoAwal) || 0), 0);
+function saldoPos() {
+  const m = {};
+  S.cfg.pos.forEach((p) => (m[p.id] = { ...p, masuk: 0, keluar: 0, saldo: Number(p.saldoAwal) || 0 }));
+  active().forEach((t) => {
+    const p = m[t.pos] || (m[t.pos] = { id: t.pos, nama: t.pos || "Tanpa pos", saldoAwal: 0, terikat: false, ket: "Pos ini tidak ada lagi di pengaturan", masuk: 0, keluar: 0, saldo: 0 });
+    if (t.jenis === "masuk") { p.masuk += t.jumlah; p.saldo += t.jumlah; } else { p.keluar += t.jumlah; p.saldo -= t.jumlah; }
+  });
+  return Object.values(m);
+}
+function saldoBefore(dateISO, posId) {
+  let s = saldoAwalTotal(posId);
+  active().forEach((t) => { if (t.tanggal < dateISO && (!posId || t.pos === posId)) s += t.jenis === "masuk" ? t.jumlah : -t.jumlah; });
+  return s;
+}
+function sumMonth(key, posId) {
+  let masuk = 0, keluar = 0, n = 0;
+  active().forEach((t) => { if (t.tanggal.slice(0, 7) === key && (!posId || t.pos === posId)) { n++; if (t.jenis === "masuk") masuk += t.jumlah; else keluar += t.jumlah; } });
+  return { masuk, keluar, n };
+}
+function monthsAvailable() {
+  const set = new Set(S.tx.map((t) => t.tanggal.slice(0, 7)));
+  set.add(thisMonth());
+  return Array.from(set).sort().reverse();
+}
+const hasContoh = () => S.tx.some((t) => t.contoh) || S.pay.some((p) => p.contoh);
+
+/* ---------- UI helpers ---------- */
+let toastTimer;
+function toast(msg) { const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => (t.hidden = true), 3200); }
+function setOptions(sel, opts, keep = true) {
+  const prev = sel.value;
+  sel.innerHTML = opts.map((o) => `<option value="${esc(o.v)}">${esc(o.t)}</option>`).join("");
+  if (keep && opts.some((o) => o.v === prev)) sel.value = prev;
+}
+function openModal(id) { $(id).hidden = false; const f = $(id).querySelector("input:not([type=radio]):not([hidden]), textarea"); if (f) setTimeout(() => f.focus(), 30); }
+function closeModal(el) { el.closest(".overlay").hidden = true; }
+document.addEventListener("click", (e) => {
+  if (e.target.matches("[data-close]")) closeModal(e.target);
+  else if (e.target.classList.contains("overlay")) e.target.hidden = true;
+});
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") $$(".overlay").forEach((o) => (o.hidden = true)); });
+
+async function fillNames(root = document) {
+  const spans = $$("[data-uid]", root);
+  if (!spans.length) return;
+  const ids = Array.from(new Set(spans.map((s) => s.dataset.uid)));
+  let ps = {};
+  try { ps = S.user ? await S.user.profiles(ids) : {}; } catch { ps = {}; }
+  spans.forEach((s) => { const p = ps[s.dataset.uid]; s.textContent = (p && p.name) || "Pengurus"; });
+}
+const byWho = (uid) => (uid ? `<span data-uid="${esc(uid)}">Pengurus</span>` : "data contoh");
+
+/* ---------- Header & banners ---------- */
+function renderHeader() {
+  const c = S.cfg;
+  $("#h-nama").textContent = c.nama || "Kas rumah ibadah";
+  $("#h-alamat").textContent = [c.jenis || "Rumah ibadah", c.alamat].filter(Boolean).join(" · ");
+  const role = $("#h-role");
+  role.classList.toggle("editor", S.canEdit);
+  $("#h-role-t").textContent = !S.db ? "Belum tersambung" : S.canEdit ? "Anda pengurus: bisa mencatat uang" : "Anda bisa melihat semua catatan";
+  $("#tab-pengaturan").hidden = !S.canEdit;
+  $("#tab-pembayaran").hidden = !S.canEdit;
+  const nBaru = S.pay.filter((p) => p.status === "baru").length;
+  $("#tab-pembayaran").textContent = "Donasi Masuk" + (nBaru ? " (" + nBaru + ")" : "");
+  $("#btn-add").hidden = !S.canEdit;
+
+  const b = [];
+  if (!S.db && S.dbChecked && window.kasAuth && window.kasAuth.configured) b.push(`<div class="banner"><div><b>Catatan belum bisa dibuka.</b> Periksa sambungan internet, lalu muat ulang halaman ini.</div></div>`);
+  else if (S.stale && !S.confirmed) b.push(`<div class="banner"><div><b>Internet sedang lambat.</b> Angka di bawah mungkin belum yang terbaru.</div></div>`);
+  if (S.offline) b.push(`<div class="banner"><div><b>Sambungan terputus.</b> Muat ulang halaman untuk melihat angka terbaru.</div></div>`);
+  if (hasContoh()) b.push(`<div class="banner info"><div><b>Ini masih contoh.</b> Angka di halaman ini hanya untuk memperlihatkan cara kerjanya, bukan uang sungguhan.${S.canEdit ? ` Hapus lewat <a href="#pengaturan" style="color:inherit;font-weight:600">Pengaturan</a> sebelum mulai mencatat.` : ""}</div></div>`);
+  $("#banners").innerHTML = b.join("");
+
+  const last = S.tx.reduce((m, t) => [t.dicatatPada, t.dibatalkanPada].reduce((mm, v) => (v && v > mm ? v : mm), m), "");
+  $("#foot-upd").textContent = last ? "Terakhir diperbarui: " + fmtWaktu(last) : "";
+}
+
+/* ---------- Ringkasan ---------- */
+function renderRingkasan() {
+  const pos = saldoPos();
+  const total = pos.reduce((s, p) => s + p.saldo, 0);
+  const nAktif = active().length;
+  $("#r-total").textContent = rp(total);
+  $("#r-total-meta").textContent = !S.txLoaded ? "Sedang memuat catatan…" : `Dihitung dari ${nAktif} catatan sejak ${fmtTgl(S.cfg.tanggalSaldoAwal)}, per hari ini ${fmtTgl(todayISO())}.`;
+
+  const key = thisMonth(), prev = addMonths(key, -1);
+  const cur = sumMonth(key), pv = sumMonth(prev);
+  const namaPrev = BULAN[Number(prev.slice(5)) - 1];
+  $("#r-bulan-t").textContent = fmtBulan(key);
+  $("#r-bulan-n").textContent = cur.n + " catatan";
+  $("#r-masuk").textContent = rp(cur.masuk);
+  $("#r-keluar").textContent = rp(cur.keluar);
+  const sel = cur.masuk - cur.keluar;
+  $("#r-selisih").textContent = (sel > 0 ? "+" : "") + rp(sel);
+  $("#r-masuk-d").textContent = "Bulan " + namaPrev + ": " + rp(pv.masuk);
+  $("#r-keluar-d").textContent = "Bulan " + namaPrev + ": " + rp(pv.keluar);
+  $("#r-selisih-d").textContent = sel >= 0 ? "Uang bertambah bulan ini" : "Uang berkurang bulan ini";
+
+  $("#r-pos").innerHTML = pos.map((p) => `
+    <div class="panel pos ${p.saldo < 0 ? "neg" : ""}">
+      <div class="row between"><h3>${esc(p.nama)}</h3>${p.terikat ? `<span class="chip lock">Khusus</span>` : `<span class="chip">Bebas dipakai</span>`}</div>
+      <div class="v">${esc(rp(p.saldo))}</div>
+      ${p.saldo < 0 ? `<div class="note" style="color:var(--bad)">Uang di kantong ini minus. Uang keluar lebih banyak daripada yang ada.</div>` : p.ket ? `<div class="note">${p.terikat ? "Hanya untuk: " : ""}${esc(p.ket)}</div>` : ""}
+      <div class="flow"><span>Total masuk ${esc(rp(p.masuk))}</span><span>Total keluar ${esc(rp(p.keluar))}</span></div>
+    </div>`).join("");
+
+  drawChart();
+
+  const recent = S.tx.slice().sort(cmpTx).reverse().slice(0, 7);
+  $("#r-recent").innerHTML = recent.length ? recent.map((t) => `
+    <div class="it">
+      <span>${esc(t.uraian || t.kategori)}${t.status === "batal" ? ` <span class="chip bad">Dibatalkan</span>` : ""}</span>
+      <span class="a" style="${t.status === "batal" ? "text-decoration:line-through;color:var(--ink-3)" : ""}">${t.jenis === "masuk" ? "+" : "−"}${esc(rp(t.jumlah).replace("−", ""))}</span>
+      <span class="m">${t.jenis === "masuk" ? "Uang masuk" : "Uang keluar"} · ${esc(fmtTgl(t.tanggal))} · ${esc(posNama(t.pos))}</span>
+    </div>`).join("") : `<div class="empty"><h3>${S.txLoaded ? "Belum ada catatan" : "Sedang memuat catatan…"}</h3><span class="small">${S.canEdit ? "Buka Catatan Uang, lalu tekan Catat uang masuk/keluar." : "Catatan akan muncul di sini setelah pengurus mencatatnya."}</span></div>`;
+
+  const nm = BULAN[Number(key.slice(5)) - 1];
+  $("#r-chart-note").textContent = !S.txLoaded ? "" : cur.masuk === 0 && cur.keluar === 0 ? `Belum ada uang masuk atau keluar di bulan ${nm}.`
+    : sel >= 0 ? `Di bulan ${nm}, uang masuk lebih banyak ${rp(sel)} daripada uang keluar.` : `Di bulan ${nm}, uang keluar lebih banyak ${rp(-sel)} daripada uang masuk.`;
+}
+
+function niceStep(v) { const p = Math.pow(10, Math.floor(Math.log10(v))); const n = v / p; return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10) * p; }
+function drawChart() {
+  const el = $("#r-chart");
+  const w = Math.max(280, Math.round(el.clientWidth || 600));
+  const h = 240, m = { t: 14, r: 6, b: 28, l: 48 };
+  const end = thisMonth();
+  const data = [];
+  for (let i = 5; i >= 0; i--) { const k = addMonths(end, -i); const s = sumMonth(k); data.push({ k, masuk: s.masuk, keluar: s.keluar }); }
+  const vmax = Math.max(1, ...data.flatMap((d) => [d.masuk, d.keluar]));
+  const step = niceStep(vmax / 4), ymax = step * Math.ceil(vmax / step);
+  const iw = w - m.l - m.r, ih = h - m.t - m.b, gw = iw / data.length;
+  const bw = Math.max(6, Math.min(26, (gw - 18) / 2));
+  const y = (v) => m.t + ih - (v / ymax) * ih;
+  const bar = (x, v) => {
+    const top = y(v), hh = m.t + ih - top; if (hh <= 0.5) return "";
+    const r = Math.min(4, bw / 2, hh);
+    return `M${x},${m.t + ih}V${top + r}Q${x},${top} ${x + r},${top}H${x + bw - r}Q${x + bw},${top} ${x + bw},${top + r}V${m.t + ih}Z`;
+  };
+  let svg = `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" role="img" aria-label="Grafik uang masuk dan uang keluar 6 bulan terakhir">`;
+  for (let v = 0; v <= ymax + 1e-6; v += step) {
+    const yy = Math.round(y(v)) + 0.5;
+    svg += `<line x1="${m.l}" x2="${w - m.r}" y1="${yy}" y2="${yy}" stroke="var(--line)" stroke-width="1" ${v === 0 ? "" : 'stroke-dasharray="2 3"'}/>`;
+    svg += `<text x="${m.l - 8}" y="${yy + 4}" text-anchor="end" font-size="11" fill="var(--ink-3)">${esc(rpShort(v))}</text>`;
+  }
+  data.forEach((d, i) => {
+    const cx = m.l + i * gw + gw / 2;
+    const x1 = cx - bw - 1, x2 = cx + 1;
+    svg += `<path d="${bar(x1, d.masuk)}" fill="var(--masuk)"/><path d="${bar(x2, d.keluar)}" fill="var(--keluar)"/>`;
+    svg += `<text x="${cx}" y="${h - 8}" text-anchor="middle" font-size="11" fill="${d.k === end ? "var(--ink)" : "var(--ink-3)"}" font-weight="${d.k === end ? 700 : 400}">${BLN[Number(d.k.slice(5)) - 1]}</text>`;
+    svg += `<rect data-i="${i}" x="${m.l + i * gw}" y="${m.t}" width="${gw}" height="${ih + m.b}" fill="transparent" class="hit"/>`;
+  });
+  svg += `</svg><div class="tip" hidden></div>`;
+  el.innerHTML = svg;
+  const tip = el.querySelector(".tip");
+  const show = (i, evx) => {
+    const d = data[i];
+    tip.innerHTML = `<div style="font-weight:700;margin-bottom:4px">${esc(fmtBulan(d.k))}</div>
+      <div class="r"><span><span class="swatch" style="background:var(--masuk)"></span>Uang masuk</span><b>${esc(rp(d.masuk))}</b></div>
+      <div class="r"><span><span class="swatch" style="background:var(--keluar)"></span>Uang keluar</span><b>${esc(rp(d.keluar))}</b></div>
+      <div class="r" style="border-top:1px solid var(--line);margin-top:4px;padding-top:4px"><span>Sisa</span><b>${esc(rp(d.masuk - d.keluar))}</b></div>`;
+    tip.hidden = false;
+    const tw = tip.offsetWidth; let left = m.l + i * gw + gw / 2 - tw / 2;
+    left = Math.max(0, Math.min(w - tw, left));
+    tip.style.left = left + "px"; tip.style.top = "0px";
+    el.querySelectorAll(".hit").forEach((r) => r.setAttribute("fill", r.dataset.i == i ? "var(--surface-2)" : "transparent"));
+    el.querySelectorAll(".hit").forEach((r) => r.setAttribute("fill-opacity", ".5"));
+  };
+  el.querySelectorAll(".hit").forEach((r) => {
+    r.addEventListener("pointerenter", () => show(+r.dataset.i));
+    r.addEventListener("click", () => show(+r.dataset.i));
+  });
+  el.querySelector("svg").addEventListener("pointerleave", () => { tip.hidden = true; el.querySelectorAll(".hit").forEach((r) => r.setAttribute("fill", "transparent")); });
+  // move hit rects behind bars so bars stay visible
+  const svgEl = el.querySelector("svg");
+  el.querySelectorAll(".hit").forEach((r) => svgEl.insertBefore(r, svgEl.firstChild));
+
+  $("#r-chart-table").innerHTML = `<table><thead><tr><th>Bulan</th><th class="r">Uang masuk</th><th class="r">Uang keluar</th><th class="r">Sisa</th></tr></thead><tbody>${data.map((d) => `<tr><td>${esc(fmtBulan(d.k))}</td><td class="r amt">${esc(rp(d.masuk))}</td><td class="r amt">${esc(rp(d.keluar))}</td><td class="r amt">${esc(rp(d.masuk - d.keluar))}</td></tr>`).join("")}</tbody></table>`;
+}
+
+/* ---------- Buku Kas ---------- */
+function renderFilters() {
+  setOptions($("#f-bulan"), [{ v: "", t: "Semua bulan" }, ...monthsAvailable().map((k) => ({ v: k, t: fmtBulan(k) }))]);
+  if (!S.filterInit) { $("#f-bulan").value = thisMonth(); S.filterInit = true; }
+  setOptions($("#f-pos"), [{ v: "", t: "Semua kantong" }, ...S.cfg.pos.map((p) => ({ v: p.id, t: p.nama }))]);
+}
+function renderLedger() {
+  const fb = $("#f-bulan").value, fp = $("#f-pos").value, fj = $("#f-jenis").value, q = $("#f-cari").value.trim().toLowerCase();
+  // Running balance over the selected pos scope (all months), voided excluded.
+  const all = S.tx.slice().sort(cmpTx);
+  let run = saldoAwalTotal(fp || null);
+  const saldoAfter = new Map();
+  all.forEach((t) => { if (t.status !== "batal" && (!fp || t.pos === fp)) { run += t.jenis === "masuk" ? t.jumlah : -t.jumlah; saldoAfter.set(t.id, run); } });
+  let rows = all.filter((t) => (!fb || t.tanggal.slice(0, 7) === fb) && (!fp || t.pos === fp) && (!fj || t.jenis === fj));
+  if (q) rows = rows.filter((t) => [t.uraian, t.kategori, t.pihak, t.metode, posNama(t.pos)].join(" ").toLowerCase().includes(q));
+
+  const startSaldo = fb ? saldoBefore(fb + "-01", fp || null) : saldoAwalTotal(fp || null);
+  const endSaldo = fb ? saldoBefore(addMonths(fb, 1) + "-01", fp || null) : run;
+  let tm = 0, tk = 0; rows.forEach((t) => { if (t.status !== "batal") { if (t.jenis === "masuk") tm += t.jumlah; else tk += t.jumlah; } });
+  const filtered = fj || q;
+
+  if (!S.txLoaded) { $("#ledger").innerHTML = `<div class="empty"><h3>Sedang memuat catatan…</h3></div>`; return; }
+  const head = `<table class="ledger"><thead><tr><th>Tanggal</th><th>Keterangan</th><th class="r">Uang masuk</th><th class="r">Uang keluar</th><th class="r">Sisa uang</th>${S.canEdit ? "<th></th>" : ""}</tr></thead><tbody>`;
+  const openRow = `<tr class="saldo-row"><td class="uraian" colspan="4">${fb ? "Uang di awal " + esc(fmtBulan(fb)) : "Uang awal pada " + esc(fmtTgl(S.cfg.tanggalSaldoAwal))}${fp ? " · " + esc(posNama(fp)) : ""}</td><td class="r amt">${esc(rp(startSaldo))}</td>${S.canEdit ? "<td></td>" : ""}</tr>`;
+  const body = rows.map((t) => {
+    const v = t.status === "batal";
+    const meta = [
+      `<span class="chip">${esc(t.kategori)}</span>`,
+      `<span>${esc(posNama(t.pos))}</span>`,
+      t.pihak ? `<span>${t.jenis === "masuk" ? "Dari" : "Kepada"} ${esc(t.pihak)}</span>` : "",
+      t.metode ? `<span>${esc(t.metode)}</span>` : "",
+      t.referensi ? `<span>No. transaksi ${esc(t.referensi)}</span>` : "",
+      t.buktiId ? `<button type="button" class="linkbtn" data-bukti="${esc(t.buktiId)}" data-type="${esc(t.buktiType || "")}">Lihat foto nota</button>` : "",
+      `<span>Dicatat ${byWho(t.dicatatOleh)}${t.dicatatPada ? ", " + esc(fmtWaktu(t.dicatatPada)) : ""}</span>`
+    ].join("");
+    const vn = v ? `<div class="voidnote">Dibatalkan oleh ${byWho(t.dibatalkanOleh)}${t.dibatalkanPada ? ", " + esc(fmtWaktu(t.dibatalkanPada)) : ""}. Alasannya: ${esc(t.alasanBatal || "—")}. Tidak dihitung.</div>` : "";
+    return `<tr class="${v ? "void" : ""}">
+      <td class="tgl" style="white-space:nowrap">${esc(fmtTgl(t.tanggal))}</td>
+      <td class="uraian"><div class="ux"><span class="t">${esc(t.uraian || t.kategori)}${v ? ` <span class="chip bad">Dibatalkan</span>` : ""}</span><span class="m">${meta}</span>${vn}</div></td>
+      <td class="r amt ${t.jenis === "masuk" ? "" : "empty-amt"}">${t.jenis === "masuk" ? esc(rp(t.jumlah)) : ""}</td>
+      <td class="r amt ${t.jenis === "keluar" ? "" : "empty-amt"}">${t.jenis === "keluar" ? "−" + esc(rp(t.jumlah)) : ""}</td>
+      <td class="r amt saldo">${v ? "—" : esc(rp(saldoAfter.get(t.id)))}</td>
+      ${S.canEdit ? `<td class="act r">${v ? `<button type="button" class="linkbtn" data-redo="${esc(t.id)}">Catat ulang</button>` : `<button type="button" class="linkbtn" style="color:var(--bad)" data-void="${esc(t.id)}">Batalkan</button>`}</td>` : ""}
+    </tr>`;
+  }).join("");
+  const empty = rows.length ? "" : `<tr><td colspan="${S.canEdit ? 6 : 5}"><div class="empty"><h3>Tidak ada catatan</h3><span class="small">${S.tx.length ? "Coba pilih bulan atau kantong lain, atau ubah kata yang dicari." : S.canEdit ? "Tekan Catat uang masuk/keluar untuk membuat catatan pertama." : "Belum ada catatan dari pengurus."}</span></div></td></tr>`;
+  const totRow = `<tr class="saldo-row"><td class="uraian" colspan="2">${filtered ? "Jumlah yang ditampilkan" : "Jumlah " + (fb ? esc(fmtBulan(fb)) : "semua bulan")}</td><td class="r amt">${esc(rp(tm))}</td><td class="r amt">−${esc(rp(tk))}</td><td class="r amt"></td>${S.canEdit ? "<td></td>" : ""}</tr>`;
+  const endRow = filtered ? "" : `<tr class="saldo-row"><td class="uraian" colspan="4">Uang di akhir ${fb ? esc(fmtBulan(fb)) : "periode"}${fp ? " · " + esc(posNama(fp)) : ""}</td><td class="r amt">${esc(rp(endSaldo))}</td>${S.canEdit ? "<td></td>" : ""}</tr>`;
+  $("#ledger").innerHTML = head + (filtered ? "" : openRow) + body + empty + totRow + endRow + "</tbody></table>";
+  fillNames($("#ledger"));
+}
+["#f-bulan", "#f-pos", "#f-jenis"].forEach((s) => $(s).addEventListener("change", renderLedger));
+$("#f-cari").addEventListener("input", renderLedger);
+$("#ledger").addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.void) openVoid(b.dataset.void);
+  else if (b.dataset.redo) openTx(S.tx.find((t) => t.id === b.dataset.redo));
+  else if (b.dataset.bukti) openBukti(b.dataset.bukti, b.dataset.type);
+});
+
+/* ---------- Form transaksi ---------- */
+let txPrefill = null;
+function txJenis() { return $("#tx-keluar").checked ? "keluar" : "masuk"; }
+function syncTxForm() {
+  const j = txJenis();
+  const kats = j === "masuk" ? S.cfg.katMasuk : S.cfg.katKeluar;
+  setOptions($("#tx-kat"), kats.map((k) => ({ v: k, t: k })));
+  $("#tx-pihak-l").textContent = j === "masuk" ? "Diterima dari siapa?" : "Dibayarkan kepada siapa?";
+  $("#tx-pihak").placeholder = j === "masuk" ? "Nama donatur, atau kosongkan" : "Nama toko, petugas, atau penerima";
+  $("#tx-pos-l").textContent = j === "masuk" ? "Masuk ke kantong" : "Diambil dari kantong";
+  $("#tx-submit").textContent = j === "masuk" ? "Simpan uang masuk" : "Simpan uang keluar";
+  checkTxWarn();
+}
+function checkTxWarn() {
+  const w = $("#tx-warn");
+  const j = txJenis(), amt = parseRp($("#tx-jumlah").value), pid = $("#tx-pos").value;
+  const p = saldoPos().find((x) => x.id === pid);
+  const msgs = [];
+  if (j === "keluar" && p && amt > p.saldo) msgs.push(`Uang di ${p.nama} tinggal ${rp(p.saldo)}. Jika dicatat, kantong ini akan minus.`);
+  if (j === "keluar" && p && p.terikat) msgs.push(`${p.nama} adalah kantong khusus${p.ket ? " (" + p.ket.toLowerCase() + ")" : ""}. Pastikan uang ini memang dipakai untuk itu.`);
+  w.textContent = msgs.join(" "); w.hidden = !msgs.length;
+}
+function openTx(pre) {
+  if (!S.canEdit) return;
+  txPrefill = pre || null;
+  $("#tx-title").textContent = pre ? "Catat ulang dengan angka yang benar" : "Catat uang";
+  $("#tx-err").hidden = true;
+  setOptions($("#tx-pos"), S.cfg.pos.map((p) => ({ v: p.id, t: p.nama + (p.terikat ? " (khusus)" : "") })), false);
+  $(pre && pre.jenis === "keluar" ? "#tx-keluar" : "#tx-masuk").checked = true;
+  syncTxForm();
+  $("#tx-tgl").value = pre ? pre.tanggal : todayISO();
+  $("#tx-jumlah").value = pre ? pre.jumlah.toLocaleString("id-ID") : "";
+  $("#tx-pos").value = pre && posById(pre.pos) ? pre.pos : S.cfg.pos[0].id;
+  if (pre) $("#tx-kat").value = pre.kategori;
+  $("#tx-uraian").value = pre ? pre.uraian : "";
+  $("#tx-pihak").value = pre ? pre.pihak || "" : "";
+  $("#tx-metode").value = pre ? pre.metode || "Tunai" : "Tunai";
+  $("#tx-bukti").value = "";
+  $("#tx-bukti-wrap").hidden = !S.assets;
+  checkTxWarn();
+  openModal("#m-tx");
+}
+$("#btn-add").addEventListener("click", () => openTx());
+$$("input[name=jenis]").forEach((r) => r.addEventListener("change", syncTxForm));
+$("#tx-pos").addEventListener("change", checkTxWarn);
+$("#tx-jumlah").addEventListener("input", (e) => {
+  const n = parseRp(e.target.value);
+  e.target.value = n ? n.toLocaleString("id-ID") : "";
+  checkTxWarn();
+});
+$("#tx-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const err = $("#tx-err"); err.hidden = true;
+  const doc = {
+    tanggal: $("#tx-tgl").value, jenis: txJenis(), pos: $("#tx-pos").value, kategori: $("#tx-kat").value,
+    uraian: $("#tx-uraian").value.trim(), pihak: $("#tx-pihak").value.trim(), metode: $("#tx-metode").value,
+    jumlah: parseRp($("#tx-jumlah").value), status: "aktif", dicatatOleh: S.myId || null, dicatatPada: new Date().toISOString(), buktiId: null, buktiType: null
+  };
+  const bad = !/^\d{4}-\d{2}-\d{2}$/.test(doc.tanggal) ? "Isi tanggalnya dulu." : !doc.jumlah ? "Isi jumlah uangnya, lebih dari Rp 0." : !doc.uraian ? "Isi keterangan singkat supaya umat tahu uang ini untuk apa." : "";
+  if (bad) { err.textContent = bad; err.hidden = false; return; }
+  if (txPrefill) doc.koreksiDari = txPrefill.id;
+  const btn = $("#tx-submit"), btnText = btn.textContent; btn.disabled = true; btn.textContent = "Menyimpan…";
+  try {
+    const f = $("#tx-bukti").files[0];
+    if (f && S.assets) {
+      btn.textContent = "Mengirim foto…";
+      const a = await S.assets.upload(f);
+      doc.buktiId = a.id; doc.buktiType = f.type || "";
+    }
+    await S.db.collection("transaksi").add(doc);
+    $("#m-tx").hidden = true;
+    toast((doc.jenis === "masuk" ? "Uang masuk " : "Uang keluar ") + rp(doc.jumlah) + " sudah dicatat");
+  } catch (x) {
+    err.textContent = x && x.code === "quota_exceeded" ? "Tempat penyimpanan penuh. Hubungi pemilik halaman." : x && x.code === "invalid_argument" ? "Anda tidak punya izin untuk mencatat." : "Gagal menyimpan. Periksa internet Anda, lalu coba lagi.";
+    err.hidden = false;
+  } finally { btn.disabled = false; btn.textContent = btnText; }
+});
+
+/* ---------- Batalkan ---------- */
+let voidId = null;
+function openVoid(id) {
+  const t = S.tx.find((x) => x.id === id); if (!t) return;
+  voidId = id;
+  $("#void-desc").textContent = `${fmtTgl(t.tanggal)} · ${t.uraian} · ${t.jenis === "masuk" ? "Uang masuk" : "Uang keluar"} ${rp(t.jumlah)}`;
+  $("#void-alasan").value = ""; $("#void-err").hidden = true;
+  openModal("#m-void");
+}
+$("#void-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const alasan = $("#void-alasan").value.trim();
+  if (alasan.length < 5) { $("#void-err").textContent = "Tuliskan alasannya, paling sedikit 5 huruf."; $("#void-err").hidden = false; return; }
+  try {
+    await S.db.doc("transaksi/" + voidId).update({ status: "batal", alasanBatal: alasan, dibatalkanOleh: S.myId || null, dibatalkanPada: new Date().toISOString() });
+    $("#m-void").hidden = true; toast("Catatan dibatalkan. Catatan itu tetap terlihat dicoret.");
+  } catch { $("#void-err").textContent = "Gagal membatalkan. Coba lagi."; $("#void-err").hidden = false; }
+});
+
+/* ---------- Bukti ---------- */
+function openBukti(id, type) {
+  const url = window.kasBuktiUrl ? window.kasBuktiUrl(id) : "#";
+  $("#bukti-body").innerHTML = type && type.indexOf("image/") !== 0
+    ? `<p>Nota ini berupa dokumen. <a href="${esc(url)}" target="_blank" rel="noopener" style="color:var(--accent);font-weight:600">Buka dokumen</a></p>`
+    : `<img class="bukti-img" src="${esc(url)}" alt="Foto nota atau kuitansi">`;
+  $("#m-bukti h2").textContent = "Foto nota";
+  openModal("#m-bukti");
+}
+
+/* ---------- Anggaran ---------- */
+function yearsAvailable() {
+  const set = new Set(S.tx.map((t) => t.tanggal.slice(0, 4))); set.add(todayISO().slice(0, 4));
+  Object.keys(S.anggaran).forEach((k) => set.add(k));
+  return Array.from(set).sort().reverse();
+}
+function renderAnggaran() {
+  setOptions($("#a-tahun"), yearsAvailable().map((y) => ({ v: y, t: y })));
+  if (!$("#a-tahun").value) $("#a-tahun").value = todayISO().slice(0, 4);
+  const yr = $("#a-tahun").value;
+  if (!S.budgetDirty) S.budgetDraft = clone((S.anggaran[yr] && S.anggaran[yr].plafon) || {});
+  const plafon = S.budgetDraft || {};
+  const real = {};
+  active().forEach((t) => { if (t.jenis === "keluar" && t.tanggal.slice(0, 4) === yr) real[t.kategori] = (real[t.kategori] || 0) + t.jumlah; });
+  const kats = S.cfg.katKeluar.slice();
+  Object.keys(real).forEach((k) => { if (!kats.includes(k)) kats.push(k); });
+  let tp = 0, tr = 0;
+  const rows = kats.map((k) => {
+    const p = Number(plafon[k]) || 0, r = real[k] || 0; tp += p; tr += r;
+    const pct = p ? r / p : 0;
+    const st = !p ? (r ? ["warn", "Belum ada rencana"] : ["", "—"]) : pct > 1 ? ["bad", "Melebihi rencana"] : pct >= 0.85 ? ["warn", "Hampir habis"] : ["good", "Aman"];
+    const fill = p ? Math.min(100, pct * 100) : 0;
+    return `<tr>
+      <td>${esc(k)}</td>
+      <td class="r">${S.canEdit ? `<input class="i plafon" data-kat="${esc(k)}" inputmode="numeric" value="${p ? esc(p.toLocaleString("id-ID")) : ""}" placeholder="0" aria-label="Rencana belanja ${esc(k)}">` : `<span class="amt">${esc(rp(p))}</span>`}</td>
+      <td class="r amt">${esc(rp(r))}</td>
+      <td style="min-width:150px">${p ? `<div class="meter" title="${Math.round(pct * 100)}% terpakai"><i class="${st[0]}" style="width:${fill}%"></i></div><div class="small muted" style="margin-top:4px">${Math.round(pct * 100)}% terpakai</div>` : ""}</td>
+      <td class="r amt">${p ? esc(rp(p - r)) : ""}</td>
+      <td>${st[0] ? `<span class="chip ${st[0]}">${st[1]}</span>` : `<span class="muted small">${st[1]}</span>`}</td>
+    </tr>`;
+  }).join("");
+  $("#a-body").innerHTML = `<table><thead><tr><th>Keperluan</th><th class="r">Rencana ${esc(yr)}</th><th class="r">Sudah terpakai</th><th>Bagian terpakai</th><th class="r">Sisa rencana</th><th>Keadaan</th></tr></thead><tbody>${rows}
+    <tr class="saldo-row"><td>Jumlah</td><td class="r amt">${esc(rp(tp))}</td><td class="r amt">${esc(rp(tr))}</td><td>${tp ? Math.round((tr / tp) * 100) + "% terpakai" : ""}</td><td class="r amt">${tp ? esc(rp(tp - tr)) : ""}</td><td></td></tr></tbody></table>`;
+  $("#a-actions").hidden = !S.canEdit;
+  $("#a-dirty").textContent = S.budgetDirty ? "Ada perubahan yang belum disimpan" : "";
+}
+$("#a-tahun").addEventListener("change", () => { S.budgetDirty = false; renderAnggaran(); });
+$("#a-body").addEventListener("input", (e) => {
+  if (!e.target.matches("input.plafon")) return;
+  const n = parseRp(e.target.value); e.target.value = n ? n.toLocaleString("id-ID") : "";
+  S.budgetDraft[e.target.dataset.kat] = n; S.budgetDirty = true; $("#a-dirty").textContent = "Ada perubahan yang belum disimpan";
+});
+$("#a-save").addEventListener("click", async () => {
+  const yr = $("#a-tahun").value;
+  const plafon = {}; Object.entries(S.budgetDraft || {}).forEach(([k, v]) => { if (Number(v) > 0) plafon[k] = Number(v); });
+  try {
+    await S.db.doc("anggaran/" + yr).set({ tahun: Number(yr), plafon, diubahOleh: S.myId || null, diubahPada: new Date().toISOString(), contoh: false });
+    S.budgetDirty = false; toast("Rencana belanja " + yr + " tersimpan"); renderAnggaran();
+  } catch { toast("Gagal menyimpan rencana. Coba lagi."); }
+});
+
+/* ---------- Laporan ---------- */
+function laporanData(key) {
+  const start = key + "-01", next = addMonths(key, 1) + "-01";
+  const pos = S.cfg.pos.map((p) => { const s = sumMonth(key, p.id); const a = saldoBefore(start, p.id); return { ...p, awal: a, masuk: s.masuk, keluar: s.keluar, akhir: a + s.masuk - s.keluar }; });
+  const km = {}, kk = {};
+  active().forEach((t) => { if (t.tanggal >= start && t.tanggal < next) { const o = t.jenis === "masuk" ? km : kk; o[t.kategori] = (o[t.kategori] || 0) + t.jumlah; } });
+  const awal = saldoBefore(start), s = sumMonth(key);
+  const batal = S.tx.filter((t) => t.status === "batal" && t.tanggal >= start && t.tanggal < next);
+  return { key, pos, km, kk, awal, masuk: s.masuk, keluar: s.keluar, akhir: awal + s.masuk - s.keluar, n: s.n, batal };
+}
+function renderLaporan() {
+  setOptions($("#l-bulan"), monthsAvailable().map((k) => ({ v: k, t: fmtBulan(k) })));
+  if (!S.lapInit) { $("#l-bulan").value = thisMonth(); S.lapInit = true; }
+  const L = laporanData($("#l-bulan").value || thisMonth());
+  const lines = (o) => Object.entries(o).sort((a, b) => b[1] - a[1]).map(([k, v]) => `<div class="ln sub"><span>${esc(k)}</span><span>${esc(rp(v))}</span></div>`).join("") || `<div class="ln sub"><span class="muted">Tidak ada</span><span></span></div>`;
+  $("#l-body").innerHTML = `
+    <div class="two">
+      <div>
+        <h2 style="margin-bottom:8px">Laporan uang ${esc(fmtBulan(L.key))}</h2>
+        <div class="statement">
+          <div class="ln tot" style="border-top:0;padding-top:6px"><span>Uang di awal bulan</span><span>${esc(rp(L.awal))}</span></div>
+          <div class="ln" style="font-weight:600"><span><span class="swatch" style="background:var(--masuk)"></span>Ditambah uang masuk</span><span>+${esc(rp(L.masuk))}</span></div>
+          ${lines(L.km)}
+          <div class="ln" style="font-weight:600"><span><span class="swatch" style="background:var(--keluar)"></span>Dikurangi uang keluar</span><span>−${esc(rp(L.keluar))}</span></div>
+          ${lines(L.kk)}
+          <div class="ln grand"><span>Uang di akhir bulan</span><span>${esc(rp(L.akhir))}</span></div>
+        </div>
+        <p class="small muted">Dihitung dari ${L.n} catatan bulan ini.${L.batal.length ? ` ${L.batal.length} catatan dibatalkan dan tidak dihitung.` : ""}</p>
+      </div>
+      <div class="stack" style="gap:14px">
+        <div>
+          <h3 style="margin-bottom:6px">Rincian per kantong dana</h3>
+          <div class="scroll"><table><thead><tr><th>Kantong</th><th class="r">Awal bulan</th><th class="r">Masuk</th><th class="r">Keluar</th><th class="r">Akhir bulan</th></tr></thead><tbody>
+          ${L.pos.map((p) => `<tr><td>${esc(p.nama)}${p.terikat ? ` <span class="chip lock">Khusus</span>` : ""}</td><td class="r amt">${esc(rp(p.awal))}</td><td class="r amt">${esc(rp(p.masuk))}</td><td class="r amt">${esc(rp(p.keluar))}</td><td class="r amt" style="font-weight:700">${esc(rp(p.akhir))}</td></tr>`).join("")}
+          </tbody></table></div>
+        </div>
+        ${L.batal.length ? `<div><h3 style="margin-bottom:6px">Catatan yang dibatalkan</h3>${L.batal.map((t) => `<div class="small" style="padding:6px 0;border-bottom:1px solid var(--line)"><b>${esc(fmtTgl(t.tanggal))}</b> · ${esc(t.uraian)} · ${esc(rp(t.jumlah))}<div class="voidnote">Alasannya: ${esc(t.alasanBatal || "—")}</div></div>`).join("")}</div>` : ""}
+      </div>
+    </div>`;
+  $("#l-csv").hidden = !S.downloads; $("#l-csv-all").hidden = !S.downloads;
+}
+$("#l-bulan").addEventListener("change", renderLaporan);
+function pengumuman(L) {
+  const fmtList = (o) => Object.entries(o).sort((a, b) => b[1] - a[1]).map(([k, v]) => `  • ${k}: ${rp(v)}`).join("\n") || "  • Tidak ada";
+  return [
+    `LAPORAN KAS ${S.cfg.nama.toUpperCase()}`,
+    `Bulan ${fmtBulan(L.key)}`, "",
+    `Uang di awal bulan: ${rp(L.awal)}`, "",
+    `Uang masuk: ${rp(L.masuk)}`, fmtList(L.km), "",
+    `Uang keluar: ${rp(L.keluar)}`, fmtList(L.kk), "",
+    `Uang di akhir bulan: ${rp(L.akhir)}`, "",
+    `Uang per kantong dana:`,
+    ...L.pos.map((p) => `  • ${p.nama}${p.terikat ? " (khusus)" : ""}: ${rp(p.akhir)}`),
+    L.batal.length ? `\n${L.batal.length} catatan dibatalkan bulan ini dan tidak dihitung.` : "",
+    "", "Terima kasih atas amanah dan kepercayaan seluruh umat."
+  ].join("\n").replace(/\n{3,}/g, "\n\n");
+}
+$("#l-copy").addEventListener("click", async () => {
+  const text = pengumuman(laporanData($("#l-bulan").value || thisMonth()));
+  try { await navigator.clipboard.writeText(text); toast("Teks laporan sudah disalin. Tempel di grup WhatsApp."); }
+  catch {
+    $("#bukti-body").innerHTML = `<p class="small muted" style="margin-top:0">Tekan lama atau blok teks di bawah ini, lalu salin.</p><textarea class="i" id="copy-area" style="min-height:320px" readonly></textarea>`;
+    $("#copy-area").value = text; $("#m-bukti h2").textContent = "Teks laporan untuk WhatsApp"; openModal("#m-bukti"); $("#copy-area").select();
+  }
+});
+function csvOf(list) {
+  const q = (v) => { const s = String(v ?? ""); return /[;"\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+  const head = ["Tanggal", "Masuk/Keluar", "Kantong dana", "Jenis", "Keterangan", "Dari/Kepada", "Cara bayar", "Jumlah", "Status", "Alasan batal", "Dicatat pada"];
+  const rows = list.slice().sort(cmpTx).map((t) => [t.tanggal, t.jenis === "masuk" ? "Uang masuk" : "Uang keluar", posNama(t.pos), t.kategori, t.uraian, t.pihak, t.metode, t.jumlah, t.status === "batal" ? "Dibatalkan" : "Aktif", t.alasanBatal || "", t.dicatatPada || ""]);
+  return "﻿" + [head, ...rows].map((r) => r.map(q).join(";")).join("\r\n");
+}
+async function saveCsv(list, name) {
+  if (!S.downloads) return;
+  try { await S.downloads.save({ filename: name, data: new Blob([csvOf(list)], { type: "text/csv" }) }); }
+  catch (x) { if (!x || x.code !== "cancelled") toast("File tidak jadi diunduh."); }
+}
+const slug = (s) => String(s || "kas").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "kas";
+$("#l-csv").addEventListener("click", () => { const k = $("#l-bulan").value || thisMonth(); saveCsv(S.tx.filter((t) => t.tanggal.slice(0, 7) === k), `kas-${slug(S.cfg.nama)}-${k}.csv`); });
+$("#l-csv-all").addEventListener("click", () => saveCsv(S.tx, `kas-${slug(S.cfg.nama)}-semua.csv`));
+
+/* ---------- Pembayaran (simulasi) ---------- */
+const PAY_ST = { baru: ["warn", "Belum diperiksa"], dicatat: ["good", "Sudah masuk catatan"], diabaikan: ["", "Diabaikan"] };
+function renderPembayaran() {
+  if (!S.canEdit) return;
+  const fs = $("#p-status").value, fm = $("#p-metode").value;
+  const baru = S.pay.filter((p) => p.status === "baru");
+  const nilai = baru.reduce((s, p) => s + p.jumlah, 0);
+  $("#p-sum").innerHTML = !S.payLoaded ? "" : baru.length
+    ? `<b>Ada ${baru.length} donasi yang belum diperiksa</b>, totalnya ${esc(rp(nilai))}.`
+    : `<span class="muted">Semua donasi sudah diperiksa.</span>`;
+  if (!S.payLoaded) { $("#p-list").innerHTML = `<div class="empty"><h3>Sedang memuat donasi…</h3></div>`; return; }
+  const rows = S.pay.filter((p) => (!fs || p.status === fs) && (!fm || p.metode === fm)).sort((a, b) => String(b.waktu || "").localeCompare(String(a.waktu || "")));
+  if (!rows.length) {
+    $("#p-list").innerHTML = `<div class="empty"><h3>Tidak ada donasi di sini</h3><span class="small">${S.pay.length ? "Coba ubah pilihan Tampilkan atau Cara bayar." : "Tekan Tambah donasi masuk untuk menyalin donasi dari notifikasi QRIS atau mutasi rekening."}</span></div>`;
+    return;
+  }
+  $("#p-list").innerHTML = `<table><thead><tr><th>Waktu</th><th>Pengirim</th><th>Cara bayar</th><th class="r">Jumlah</th><th>Keadaan</th><th></th></tr></thead><tbody>${rows.map((p) => {
+    const st = PAY_ST[p.status] || ["", p.status];
+    const jam = String(p.waktu || "").slice(11, 16);
+    const meta = [p.referensi ? `<span>No. transaksi ${esc(p.referensi)}</span>` : "", p.catatan ? `<span>Pesan: “${esc(p.catatan)}”</span>` : ""].join("");
+    const handled = p.status !== "baru" ? `<span>${p.status === "dicatat" ? "Dimasukkan ke catatan" : "Diabaikan"} oleh ${byWho(p.ditanganiOleh)}${p.ditanganiPada ? ", " + esc(fmtWaktu(p.ditanganiPada)) : ""}</span>` : "";
+    const act = p.status === "baru"
+      ? `<div class="row" style="justify-content:flex-end;gap:12px"><button type="button" class="btn primary" data-match="${esc(p.id)}">Masukkan ke catatan</button><button type="button" class="linkbtn" style="color:var(--ink-2)" data-ignore="${esc(p.id)}">Abaikan</button></div>`
+      : p.status === "diabaikan" ? `<button type="button" class="linkbtn" data-restore="${esc(p.id)}">Pulihkan</button>` : "";
+    return `<tr>
+      <td style="white-space:nowrap">${esc(fmtTgl(p.tanggal))}${jam ? `<div class="small muted">${esc(jam.replace(":", "."))}</div>` : ""}</td>
+      <td><div class="ux"><span class="t">${esc(p.pengirim || "Tanpa nama")}</span><span class="m">${meta}${handled}</span></div></td>
+      <td>${esc(p.metode)}</td>
+      <td class="r amt">${esc(rp(p.jumlah))}</td>
+      <td>${st[0] ? `<span class="chip ${st[0]}">${st[1]}</span>` : `<span class="chip">${st[1]}</span>`}</td>
+      <td class="r">${act}</td>
+    </tr>`;
+  }).join("")}</tbody></table>`;
+  fillNames($("#p-list"));
+}
+$("#p-status").addEventListener("change", renderPembayaran);
+$("#p-metode").addEventListener("change", renderPembayaran);
+$("#p-add").addEventListener("click", () => {
+  const d = new Date();
+  $("#pay-tgl").value = todayISO(); $("#pay-jam").value = pad(d.getHours()) + ":" + pad(d.getMinutes());
+  $("#pay-metode").value = "QRIS"; ["#pay-jumlah", "#pay-pengirim", "#pay-ref", "#pay-catatan"].forEach((s) => ($(s).value = ""));
+  $("#pay-err").hidden = true; openModal("#m-pay");
+});
+$("#pay-jumlah").addEventListener("input", (e) => { const n = parseRp(e.target.value); e.target.value = n ? n.toLocaleString("id-ID") : ""; });
+$("#pay-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const tgl = $("#pay-tgl").value, jml = parseRp($("#pay-jumlah").value), err = $("#pay-err");
+  const bad = !/^\d{4}-\d{2}-\d{2}$/.test(tgl) ? "Isi tanggalnya dulu." : !jml ? "Isi jumlah uangnya, lebih dari Rp 0." : "";
+  if (bad) { err.textContent = bad; err.hidden = false; return; }
+  const doc = { tanggal: tgl, waktu: tgl + "T" + ($("#pay-jam").value || "00:00") + ":00", metode: $("#pay-metode").value, jumlah: jml,
+    pengirim: $("#pay-pengirim").value.trim(), referensi: $("#pay-ref").value.trim(), catatan: $("#pay-catatan").value.trim(),
+    status: "baru", dibuatOleh: S.myId || null, dibuatPada: new Date().toISOString(), contoh: false };
+  try { await S.db.collection("pembayaran").add(doc); $("#m-pay").hidden = true; toast("Donasi " + rp(jml) + " ditambahkan. Periksa lalu masukkan ke catatan."); }
+  catch { err.textContent = "Gagal menyimpan. Coba lagi."; err.hidden = false; }
+});
+function tebakPos(p) {
+  const t = (p.catatan || "").toLowerCase();
+  const find = (re) => S.cfg.pos.find((x) => re.test(x.nama.toLowerCase()));
+  if (/renovasi|bangun|atap|gedung/.test(t)) return find(/bangun|renovasi/);
+  if (/banjir|bencana|yatim|duafa|santun|sosial|sembako/.test(t)) return find(/sosial|santun/);
+  return null;
+}
+let matchId = null;
+function openMatch(id) {
+  const p = S.pay.find((x) => x.id === id); if (!p) return;
+  matchId = id;
+  $("#match-desc").textContent = `${fmtTgl(p.tanggal)} · ${p.metode} · ${p.pengirim || "Tanpa nama"} · ${rp(p.jumlah)}${p.referensi ? " · No. transaksi " + p.referensi : ""}`;
+  setOptions($("#match-pos"), S.cfg.pos.map((x) => ({ v: x.id, t: x.nama + (x.terikat ? " (khusus)" : "") })), false);
+  $("#match-pos").value = (tebakPos(p) || S.cfg.pos[0]).id;
+  setOptions($("#match-kat"), S.cfg.katMasuk.map((k) => ({ v: k, t: k })), false);
+  const kd = S.cfg.katMasuk.find((k) => /donasi perorangan/i.test(k)) || S.cfg.katMasuk[0];
+  $("#match-kat").value = kd;
+  $("#match-uraian").value = "Donasi lewat " + p.metode + (p.catatan ? ": " + p.catatan : "");
+  $("#match-err").hidden = true;
+  openModal("#m-match");
+}
+$("#match-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const p = S.pay.find((x) => x.id === matchId); if (!p) return;
+  const err = $("#match-err"), btn = $("#match-submit");
+  const uraian = $("#match-uraian").value.trim();
+  if (!uraian) { err.textContent = "Isi keterangan singkat."; err.hidden = false; return; }
+  btn.disabled = true;
+  try {
+    const now = new Date().toISOString();
+    const ref = S.db.collection("transaksi").doc();
+    await ref.set({ tanggal: p.tanggal, jenis: "masuk", pos: $("#match-pos").value, kategori: $("#match-kat").value, uraian,
+      pihak: p.pengirim || "Tanpa nama", metode: p.metode, jumlah: p.jumlah, status: "aktif", dicatatOleh: S.myId || null, dicatatPada: now,
+      buktiId: null, buktiType: null, referensi: p.referensi || "", pembayaranId: p.id, contoh: !!p.contoh });
+    await S.db.doc("pembayaran/" + p.id).update({ status: "dicatat", transaksiId: ref.id, ditanganiOleh: S.myId || null, ditanganiPada: now });
+    $("#m-match").hidden = true; toast("Uang masuk " + rp(p.jumlah) + " sudah masuk Catatan Uang");
+  } catch { err.textContent = "Gagal menyimpan. Cek dulu Catatan Uang sebelum mencoba lagi, supaya tidak tercatat dua kali."; err.hidden = false; }
+  finally { btn.disabled = false; }
+});
+$("#p-list").addEventListener("click", async (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.match) return openMatch(b.dataset.match);
+  if (b.dataset.ignore) {
+    if (!b.dataset.armed) { b.dataset.armed = "1"; b.textContent = "Tekan lagi untuk mengabaikan"; b.style.color = "var(--bad)"; return; }
+    try { await S.db.doc("pembayaran/" + b.dataset.ignore).update({ status: "diabaikan", ditanganiOleh: S.myId || null, ditanganiPada: new Date().toISOString() }); toast("Donasi diabaikan"); }
+    catch { toast("Gagal mengubah status. Coba lagi."); }
+  }
+  if (b.dataset.restore) {
+    try { await S.db.doc("pembayaran/" + b.dataset.restore).update({ status: "baru", ditanganiOleh: null, ditanganiPada: null }); toast("Donasi kembali ke daftar yang belum diperiksa"); }
+    catch { toast("Gagal mengubah status. Coba lagi."); }
+  }
+});
+
+/* ---------- Pengaturan ---------- */
+let posDraft = [];
+function renderPengaturan(force) {
+  $("#s-contoh").hidden = !hasContoh();
+  if (S.settingsDirty && !force) return;
+  const c = S.cfg;
+  $("#s-nama").value = c.nama; $("#s-jenis").value = c.jenis || "Rumah ibadah"; $("#s-alamat").value = c.alamat || ""; $("#s-tgl").value = c.tanggalSaldoAwal || "";
+  $("#s-katmasuk").value = c.katMasuk.join("\n"); $("#s-katkeluar").value = c.katKeluar.join("\n");
+  posDraft = clone(c.pos);
+  drawPosRows();
+}
+function drawPosRows() {
+  const used = new Set(S.tx.map((t) => t.pos));
+  $("#s-pos").innerHTML = posDraft.map((p, i) => `
+    <div class="posrow" data-i="${i}">
+      <label class="f">Nama kantong<input class="i" data-k="nama" value="${esc(p.nama)}" maxlength="40"></label>
+      <label class="f">Uang awal (Rp)<input class="i" data-k="saldoAwal" inputmode="numeric" value="${p.saldoAwal ? esc(Number(p.saldoAwal).toLocaleString("id-ID")) : ""}" placeholder="0"></label>
+      <label class="cb"><input type="checkbox" data-k="terikat" ${p.terikat ? "checked" : ""}> Khusus</label>
+      <label class="f ket">Dipakai untuk<input class="i" data-k="ket" value="${esc(p.ket)}" maxlength="90"></label>
+      <button type="button" class="btn" data-del="${i}" ${used.has(p.id) || posDraft.length < 2 ? `disabled title="Kantong yang sudah punya catatan tidak bisa dihapus"` : ""}>Hapus</button>
+    </div>`).join("");
+}
+$("#s-pos").addEventListener("input", (e) => {
+  const row = e.target.closest(".posrow"); if (!row) return;
+  const p = posDraft[+row.dataset.i], k = e.target.dataset.k;
+  if (k === "saldoAwal") { const n = parseRp(e.target.value); e.target.value = n ? n.toLocaleString("id-ID") : ""; p.saldoAwal = n; }
+  else if (k === "terikat") p.terikat = e.target.checked;
+  else p[k] = e.target.value;
+  S.settingsDirty = true;
+});
+$("#s-pos").addEventListener("change", (e) => { if (e.target.dataset.k === "terikat") { posDraft[+e.target.closest(".posrow").dataset.i].terikat = e.target.checked; S.settingsDirty = true; } });
+$("#s-pos").addEventListener("click", (e) => { const b = e.target.closest("[data-del]"); if (!b || b.disabled) return; posDraft.splice(+b.dataset.del, 1); S.settingsDirty = true; drawPosRows(); });
+$("#s-pos-add").addEventListener("click", () => { posDraft.push({ id: "pos-" + Date.now().toString(36), nama: "Kantong baru", saldoAwal: 0, terikat: false, ket: "" }); S.settingsDirty = true; drawPosRows(); });
+["#s-nama", "#s-jenis", "#s-alamat", "#s-tgl", "#s-katmasuk", "#s-katkeluar"].forEach((s) => $(s).addEventListener("input", () => (S.settingsDirty = true)));
+$("#s-save").addEventListener("click", async () => {
+  const lines = (s) => Array.from(new Set($(s).value.split("\n").map((x) => x.trim()).filter(Boolean)));
+  const cfg = {
+    nama: $("#s-nama").value.trim() || "Kas rumah ibadah", jenis: $("#s-jenis").value, alamat: $("#s-alamat").value.trim(),
+    tanggalSaldoAwal: $("#s-tgl").value || DEFAULT_CFG.tanggalSaldoAwal,
+    pos: posDraft.map((p) => ({ ...p, nama: String(p.nama).trim() || "Pos", saldoAwal: Number(p.saldoAwal) || 0 })),
+    katMasuk: lines("#s-katmasuk"), katKeluar: lines("#s-katkeluar"),
+    diubahOleh: S.myId || null, diubahPada: new Date().toISOString()
+  };
+  if (!cfg.katMasuk.length || !cfg.katKeluar.length) { $("#s-msg").textContent = "Isi paling sedikit satu jenis uang masuk dan satu jenis uang keluar."; return; }
+  if (!cfg.pos.length) { $("#s-msg").textContent = "Buat paling sedikit satu kantong dana."; return; }
+  try { await S.db.doc("config/umum").set(cfg); S.settingsDirty = false; $("#s-msg").textContent = ""; toast("Pengaturan tersimpan"); }
+  catch { $("#s-msg").textContent = "Gagal menyimpan. Coba lagi."; }
+});
+let armTimer;
+$("#s-contoh-del").addEventListener("click", async (e) => {
+  const b = e.currentTarget;
+  if (!b.classList.contains("armed")) { b.classList.add("armed"); b.textContent = "Tekan sekali lagi untuk menghapus " + S.tx.filter((t) => t.contoh).length + " catatan contoh"; clearTimeout(armTimer); armTimer = setTimeout(() => { b.classList.remove("armed"); b.textContent = "Hapus semua data contoh"; }, 5000); return; }
+  clearTimeout(armTimer); b.disabled = true; b.textContent = "Menghapus…";
+  const ids = S.tx.filter((t) => t.contoh).map((t) => t.id);
+  try {
+    for (let i = 0; i < ids.length; i += 8) await Promise.all(ids.slice(i, i + 8).map((id) => S.db.doc("transaksi/" + id).delete()));
+    const pids = S.pay.filter((p) => p.contoh).map((p) => p.id);
+    for (let i = 0; i < pids.length; i += 8) await Promise.all(pids.slice(i, i + 8).map((id) => S.db.doc("pembayaran/" + id).delete()));
+    for (const [yr, a] of Object.entries(S.anggaran)) if (a && a.contoh) await S.db.doc("anggaran/" + yr).delete();
+    toast("Data contoh sudah dihapus. Siap dipakai untuk mencatat uang sungguhan.");
+  } catch { toast("Sebagian data contoh gagal dihapus. Coba lagi."); }
+  b.disabled = false; b.classList.remove("armed"); b.textContent = "Hapus semua data contoh";
+});
+
+/* ---------- Routing & render ---------- */
+function setGuide(hide) {
+  $("#guide").hidden = hide; $("#guide-open").hidden = !hide;
+  try { localStorage.setItem("kt-guide-hidden", hide ? "1" : "0"); } catch {}
+}
+try { if (localStorage.getItem("kt-guide-hidden") === "1") { $("#guide").hidden = true; $("#guide-open").hidden = false; } } catch {}
+$("#guide-close").addEventListener("click", () => setGuide(true));
+$("#guide-open").addEventListener("click", () => { setGuide(false); location.hash = "#ringkasan"; window.scrollTo(0, 0); });
+
+const VIEWS = ["ringkasan", "buku-kas", "anggaran", "laporan", "pembayaran", "pengaturan"];
+function route() {
+  let v = (location.hash || "").replace("#", "");
+  if (!VIEWS.includes(v) || ((v === "pengaturan" || v === "pembayaran") && !S.canEdit)) v = "ringkasan";
+  const changed = v !== S.view; S.view = v;
+  VIEWS.forEach((x) => ($("#v-" + x).hidden = x !== v));
+  $$("nav.tabs a").forEach((a) => { if (a.dataset.v === v) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+  if (changed && v === "pengaturan") renderPengaturan(true);
+  renderView();
+}
+function renderView() {
+  if (S.view === "ringkasan") renderRingkasan();
+  else if (S.view === "buku-kas") { renderFilters(); renderLedger(); }
+  else if (S.view === "anggaran") renderAnggaran();
+  else if (S.view === "laporan") renderLaporan();
+  else if (S.view === "pembayaran") renderPembayaran();
+  else if (S.view === "pengaturan") renderPengaturan(false);
+}
+let rq = false;
+function render() { if (rq) return; rq = true; requestAnimationFrame(() => { rq = false; renderHeader(); renderView(); }); }
+window.addEventListener("hashchange", route);
+let rw; new ResizeObserver(() => { clearTimeout(rw); rw = setTimeout(() => { if (S.view === "ringkasan") drawChart(); }, 120); }).observe($("#r-chart"));
+
+/* ---------- Boot ---------- */
+async function boot() {
+  route(); renderHeader();
+  const C = window.claude;
+  if (!C || !C.use) { S.dbChecked = true; render(); return; }
+  const [db, user] = await Promise.all([C.use("db"), C.use("user")]);
+  S.db = db; S.user = user; S.dbChecked = true;
+  if (user) {
+    try { S.canEdit = !!(await user.canEdit()); } catch { S.canEdit = false; }
+    try { S.myId = await user.id(); } catch { S.myId = null; }
+  }
+  C.use("assets").then((a) => { S.assets = a; }).catch(() => {});
+  C.use("downloads").then((d) => { S.downloads = d; render(); }).catch(() => {});
+  route();
+  if (!db) { render(); return; }
+  const timer = setTimeout(() => { if (!S.confirmed) { S.stale = true; render(); } }, 10000);
+  const onErr = () => { clearTimeout(timer); S.offline = true; render(); };
+  db.doc("config/umum").onSnapshot((snap) => { S.cfg = normCfg(snap.exists ? snap.data() : null); render(); }, onErr);
+  db.collection("transaksi").onSnapshot((snap) => {
+    S.tx = snap.docs.map((d) => { const x = d.data() || {}; return { id: d.id, ...x, jumlah: Number(x.jumlah) || 0, tanggal: String(x.tanggal || "1970-01-01"), kategori: String(x.kategori || "Lainnya") }; });
+    S.txLoaded = true;
+    if (!snap.metadata.fromCache) { S.confirmed = true; S.stale = false; clearTimeout(timer); }
+    render();
+  }, onErr);
+  db.collection("anggaran").onSnapshot((snap) => { const a = {}; snap.docs.forEach((d) => (a[d.id] = d.data())); S.anggaran = a; render(); }, onErr);
+  if (S.canEdit) db.collection("pembayaran").onSnapshot((snap) => {
+    S.pay = snap.docs.map((d) => { const x = d.data() || {}; return { id: d.id, ...x, jumlah: Number(x.jumlah) || 0, tanggal: String(x.tanggal || "1970-01-01"), metode: String(x.metode || "Lainnya"), status: String(x.status || "baru") }; });
+    S.payLoaded = true; render();
+  }, () => { S.payLoaded = true; render(); });
+}
+boot();
+})();
+</script>
+<script src="auth.js"></script>
+</body>
+</html>
